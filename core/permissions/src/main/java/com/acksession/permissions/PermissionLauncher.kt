@@ -2,10 +2,13 @@ package com.acksession.permissions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
@@ -64,14 +67,18 @@ fun rememberPermissionLauncher(
     permissions: List<String>,
     rationaleTitle: String,
     rationaleMessage: String,
+    viewModel: PermissionViewModel = hiltViewModel(),
     onResult: (granted: Boolean) -> Unit = {}
 ): PermissionLauncher {
     // Track whether we should show dialogs
-    var showRationaleDialog by remember { mutableStateOf(false) }
-    var showSettingsDialog by remember { mutableStateOf(false) }
+    var showRationaleDialog by rememberSaveable { mutableStateOf(false) }
+    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
 
-    // Track if we've ever requested permissions (to differentiate first request from permanently denied)
-    var hasRequestedPermission by remember { mutableStateOf(false) }
+    // Load persistent state from ViewModel: has this permission been requested before?
+    // Use first permission as the key (permissions list is typically single-item or related)
+    val hasRequestedPermission by viewModel
+        .hasRequestedPermission(permissions.first())
+        .collectAsState(initial = false)
 
     // Use Accompanist's permission state for actual permission management
     val permissionState = rememberMultiplePermissionsState(
@@ -102,7 +109,7 @@ fun rememberPermissionLauncher(
         rationaleMessage = rationaleMessage
     )
 
-    return remember(permissionState) {
+    return remember(permissionState, hasRequestedPermission) {
         object : PermissionLauncher {
             override val isGranted: Boolean
                 get() = permissionState.allPermissionsGranted
@@ -119,14 +126,18 @@ fun rememberPermissionLauncher(
                         showRationaleDialog = true
                     }
 
-                    // First request
+                    // First request (must check BEFORE permanently denied)
+                    // ViewModel uses DataStore, so state persists across app restarts
                     !hasRequestedPermission -> {
-                        hasRequestedPermission = true
+                        // Mark permission as requested via ViewModel (handles coroutine scope)
+                        viewModel.markPermissionRequested(permissions.first())
                         permissionState.launchMultiplePermissionRequest()
                     }
 
-                    // Permanently denied (after second denial AND we've requested before)
-                    hasRequestedPermission && permissionState.isPermanentlyDenied() -> {
+                    // Permanently denied - show settings dialog
+                    // Using revokedPermissions check prevents false positives when permission is granted but state hasn't updated
+                    // hasRequestedPermission is now persistent, so this works correctly after app restart
+                    hasRequestedPermission && permissionState.hasRevokedPermissions() && permissionState.isPermanentlyDenied() -> {
                         showSettingsDialog = true
                     }
 
