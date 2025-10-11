@@ -32,11 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.acksession.permissions.PermissionHandler
+import com.acksession.permissions.PermissionGate
+import com.acksession.permissions.rememberPermissionLauncher
 import com.acksession.ui.icons.ZencastrIcons
 
 /**
@@ -51,6 +51,34 @@ fun RecordingScreen(
     val recordingState by viewModel.recordingState.collectAsState()
     val cameraSelector by viewModel.cameraSelector.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Camera controller - lifted to screen level so permission callback can access it
+    val cameraController = remember {
+        LifecycleCameraController(context).apply {
+            setEnabledUseCases(CameraController.VIDEO_CAPTURE)
+        }
+    }
+
+    // Audio permission launcher for on-demand permission requests
+    val audioPermissionLauncher = rememberPermissionLauncher(
+        permissions = listOf(Manifest.permission.RECORD_AUDIO),
+        rationaleTitle = "Microphone Required",
+        rationaleMessage = "We need access to your microphone to record audio with your video."
+    ) { granted ->
+        // Auto-start recording when permission is granted
+        if (granted) {
+            val outputOptions = viewModel.getOutputOptions()
+            @SuppressLint("MissingPermission")
+            val recording = cameraController.startRecording(
+                outputOptions,
+                AudioConfig.create(true),
+                ContextCompat.getMainExecutor(context)
+            ) { event ->
+                viewModel.handleRecordingEvent(event)
+            }
+            viewModel.startRecording(recording)
+        }
+    }
 
     // Handle recording state changes
     LaunchedEffect(recordingState) {
@@ -76,13 +104,11 @@ fun RecordingScreen(
         }
     }
 
-    PermissionHandler(
-        permissions = listOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-        ),
-        rationaleTitle = "Camera & Microphone Required",
-        rationaleMessage = "This app needs access to your camera and microphone to record videos."
+    // Request camera permission at screen level (needed for preview)
+    PermissionGate(
+        permissions = listOf(Manifest.permission.CAMERA),
+        rationaleTitle = "Camera Required",
+        rationaleMessage = "This app needs access to your camera to show camera preview and record videos."
     ) {
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -92,13 +118,6 @@ fun RecordingScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                // Camera Preview
-                val cameraController = remember {
-                    LifecycleCameraController(context).apply {
-                        setEnabledUseCases(CameraController.VIDEO_CAPTURE)
-                    }
-                }
-
                 // Update camera selector when it changes
                 LaunchedEffect(cameraSelector) {
                     cameraController.cameraSelector = cameraSelector
@@ -154,28 +173,24 @@ fun RecordingScreen(
                         RecordButton(
                             isRecording = recordingState is RecordingState.Recording,
                             onStartRecording = {
-                                if (ActivityCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.RECORD_AUDIO
-                                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-                                ) {
-                                    Toast.makeText(
-                                        context,
-                                        "Audio permission not granted",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    return@RecordButton
-                                }
+                                // Check if audio permission is granted
+                                if (!audioPermissionLauncher.isGranted) {
+                                    // Request audio permission (will auto-start recording on grant via callback)
+                                    audioPermissionLauncher.launch()
+                                } else {
+                                    // Permission already granted - start recording directly
+                                    val outputOptions = viewModel.getOutputOptions()
 
-                                val outputOptions = viewModel.getOutputOptions()
-                                val recording = cameraController.startRecording(
-                                    outputOptions,
-                                    AudioConfig.create(true),
-                                    ContextCompat.getMainExecutor(context)
-                                ) { event ->
-                                    viewModel.handleRecordingEvent(event)
+                                    @SuppressLint("MissingPermission")
+                                    val recording = cameraController.startRecording(
+                                        outputOptions,
+                                        AudioConfig.create(true),
+                                        ContextCompat.getMainExecutor(context)
+                                    ) { event ->
+                                        viewModel.handleRecordingEvent(event)
+                                    }
+                                    viewModel.startRecording(recording)
                                 }
-                                viewModel.startRecording(recording)
                             },
                             onStopRecording = {
                                 viewModel.stopRecording()
