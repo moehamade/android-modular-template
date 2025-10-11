@@ -1,6 +1,7 @@
 plugins {
     id("zencastr.android.application")
     id("zencastr.android.compose")
+    id("zencastr.android.hilt")
 }
 
 android {
@@ -13,6 +14,7 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":feature:recording"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

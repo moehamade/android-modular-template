@@ -33,5 +33,9 @@ gradlePlugin {
             id = "zencastr.android.room"
             implementationClass = "AndroidRoomConventionPlugin"
         }
+        register("androidFeature") {
+            id = "zencastr.android.feature"
+            implementationClass = "AndroidFeatureConventionPlugin"
+        }
     }
 }
