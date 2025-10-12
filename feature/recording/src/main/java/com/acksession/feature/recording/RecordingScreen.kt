@@ -99,7 +99,7 @@ fun RecordingScreen(
             },
             permissionDeniedContent = { onEnablePermissions, shouldOpenSettings ->
                 // Permission denied UI shown when permissions are not granted
-                PermissionDeniedContent(
+                RecordingPermissionDeniedContent(
                     onEnablePermissions = {
                         if (shouldOpenSettings) {
                             // Permanently denied - open settings

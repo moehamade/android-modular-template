@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="enable_permissions">Enable Permissions</string>
+    <string name="permission_required">Permission required</string>
+    <string name="camera_and_microphone_access_are_required_to_record_videos_with_audio_please_grant_the_necessary_permissions_to_continue">Camera and microphone access are required to record videos with audio. Please grant the necessary permissions to continue.</string>
+    <string name="permissions_required">Permissions Required</string>
+    <string name="location_required">Location Required</string>
+    <string name="we_need_location_access_to_show_nearby_users">We need location access to show nearby users.</string>
+    <string name="grant_location">Grant Location</string>
+</resources>

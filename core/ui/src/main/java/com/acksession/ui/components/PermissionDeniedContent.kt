@@ -1,4 +1,4 @@
-package com.acksession.feature.recording
+package com.acksession.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,26 +17,45 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.acksession.ui.R
 import com.acksession.ui.theme.ZencastrTheme
 
 /**
- * Enhanced permission denied content that displays a clear message to the user
- * when camera or microphone permissions are not granted.
+ * Generic permission denied content that displays a clear message to the user
+ * when required permissions are not granted.
  *
  * Features:
  * - Warning icon for visual emphasis
- * - Clear title and message
+ * - Customizable title and message
  * - Centered layout with proper spacing
  * - Material Design styling
+ * - Full-screen blocking layout for required permissions
  *
+ * Usage:
+ * ```
+ * PermissionDeniedContent(
+ *     title = "Camera Access Required",
+ *     message = "We need camera access to take photos. Please grant permission to continue.",
+ *     buttonText = "Grant Permission",
+ *     onEnablePermissions = { /* Request permissions or open settings */ }
+ * )
+ * ```
+ *
+ * @param title The title text to display
+ * @param message The explanation message about why permissions are needed
+ * @param buttonText The text for the action button (default: "Enable Permissions")
  * @param onEnablePermissions Callback when the user clicks the enable permissions button
  * @param modifier Modifier for the container
  */
 @Composable
 fun PermissionDeniedContent(
+    title: String,
+    message: String,
+    buttonText: String = stringResource(R.string.enable_permissions),
     onEnablePermissions: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -50,7 +69,7 @@ fun PermissionDeniedContent(
         // Warning icon
         Icon(
             imageVector = Icons.Default.Warning,
-            contentDescription = "Permission required",
+            contentDescription = stringResource(R.string.permission_required),
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.error
         )
@@ -59,7 +78,7 @@ fun PermissionDeniedContent(
 
         // Title
         Text(
-            text = "Permissions Required",
+            text = title,
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
@@ -69,7 +88,7 @@ fun PermissionDeniedContent(
 
         // Message
         Text(
-            text = "Camera and microphone access are required to record videos with audio. Please grant the necessary permissions to continue.",
+            text = message,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -82,15 +101,32 @@ fun PermissionDeniedContent(
             onClick = onEnablePermissions,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Enable Permissions")
+            Text(buttonText)
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun PermissionDeniedContentPreview() {
     ZencastrTheme {
-        PermissionDeniedContent(onEnablePermissions = {})
+        PermissionDeniedContent(
+            title = stringResource(R.string.permissions_required),
+            message = stringResource(R.string.camera_and_microphone_access_are_required_to_record_videos_with_audio_please_grant_the_necessary_permissions_to_continue),
+            onEnablePermissions = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun PermissionDeniedContentShortPreview() {
+    ZencastrTheme {
+        PermissionDeniedContent(
+            title = stringResource(R.string.location_required),
+            message = stringResource(R.string.we_need_location_access_to_show_nearby_users),
+            buttonText = stringResource(R.string.grant_location),
+            onEnablePermissions = {}
+        )
     }
 }
