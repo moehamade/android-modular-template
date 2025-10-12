@@ -4,18 +4,26 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 /**
- * App-level navigation destinations.
+ * Recording feature navigation routes.
  *
- * These are root-level destinations that can be used across the app.
- * Feature modules can reference these destinations without creating circular dependencies.
+ * This sealed interface defines all navigation destinations within the Recording feature.
+ * Kept in :core:navigation as it's the app's starting point.
  *
- * @Serializable enables automatic serialization/deserialization of navigation parameters.
- * NavKey marks these as valid navigation destinations.
+ * Note: In a larger app, you could move this to :feature:recording:api for consistency.
  */
-object AppDestinations {
+@Serializable
+sealed interface RecordingRoute : NavKey {
     /**
-     * Recording destination - the main screen for video recording.
+     * Main recording screen for capturing video.
      */
     @Serializable
-    data object Recording : NavKey
+    data object Recording : RecordingRoute
 }
+
+/**
+ * Extension function for navigating to the recording screen.
+ */
+fun Navigator.navigateToRecording() {
+    navigateTo(RecordingRoute.Recording)
+}
+

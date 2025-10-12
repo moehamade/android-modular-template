@@ -1,9 +1,9 @@
 package com.acksession.feature.recording.navigation
 
 import com.acksession.feature.recording.RecordingScreen
-import com.acksession.navigation.AppDestinations
 import com.acksession.navigation.EntryProviderInstaller
 import com.acksession.navigation.Navigator
+import com.acksession.navigation.RecordingRoute
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,10 +28,11 @@ object RecordingNavigationModule {
         navigator: Navigator
     ): EntryProviderInstaller = {
         // Register the Recording destination
-        entry<AppDestinations.Recording> {
+        entry<RecordingRoute.Recording> {
             RecordingScreen(
                 navigator = navigator
             )
         }
     }
 }
+

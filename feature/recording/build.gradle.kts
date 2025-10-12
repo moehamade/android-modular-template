@@ -1,6 +1,5 @@
 plugins {
     id("zencastr.android.feature")
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -8,8 +7,8 @@ android {
 }
 
 dependencies {
-    // Profile feature for navigation (routes only)
-    implementation(project(":feature:profile"))
+    // Profile API for navigation (routes only, no UI dependencies)
+    implementation(project(":feature:profile:api"))
 
     // Permission handling
     implementation(libs.accompanist.permissions)

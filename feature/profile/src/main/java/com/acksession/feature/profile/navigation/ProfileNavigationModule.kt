@@ -1,6 +1,11 @@
 package com.acksession.feature.profile.navigation
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import com.acksession.feature.profile.ProfileScreen
+import com.acksession.feature.profile.api.ProfileRoute
 import com.acksession.navigation.EntryProviderInstaller
 import com.acksession.navigation.Navigator
 import dagger.Module
@@ -12,10 +17,9 @@ import dagger.multibindings.IntoSet
 /**
  * Hilt module that provides the profile feature's navigation entry provider.
  *
- * This module demonstrates modular navigation with parameters:
- * - The ProfileDestination data class contains navigation parameters
- * - The entry provider extracts parameters and passes them to ProfileScreen
- * - The feature self-registers without app module knowing about it
+ * This module registers all ProfileRoute destinations:
+ * - ProfileRoute.Profile: Main profile screen
+ * - ProfileRoute.ProfileDialog: Dialog for testing dialog navigation
  */
 @Module
 @InstallIn(ActivityRetainedComponent::class)
@@ -26,14 +30,46 @@ object ProfileNavigationModule {
     fun provideProfileEntryProvider(
         navigator: Navigator
     ): EntryProviderInstaller = {
-        // Register the Profile destination with parameters
-        entry<ProfileDestination> { destination ->
+
+        entry<ProfileRoute.Profile> { route ->
             ProfileScreen(
-                userId = destination.userId,
-                name = destination.name,
-                role = destination.role,
+                userId = route.userId,
+                name = route.name,
+                role = route.role,
+                navigator = navigator
+            )
+        }
+
+        entry<ProfileRoute.ProfileDialog> { route ->
+            ProfileDialogContent(
+                userId = route.userId,
+                message = route.message,
                 navigator = navigator
             )
         }
     }
 }
+
+/**
+ * Simple dialog composable for testing dialog-style navigation.
+ */
+@Composable
+private fun ProfileDialogContent(
+    userId: String,
+    message: String,
+    navigator: Navigator
+) {
+    AlertDialog(
+        onDismissRequest = { navigator.navigateBack() },
+        title = { Text("Profile Dialog") },
+        text = {
+            Text("User: $userId\nMessage: $message")
+        },
+        confirmButton = {
+            TextButton(onClick = { navigator.navigateBack() }) {
+                Text("Close")
+            }
+        }
+    )
+}
+

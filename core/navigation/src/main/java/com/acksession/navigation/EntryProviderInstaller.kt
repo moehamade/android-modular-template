@@ -1,6 +1,7 @@
 package com.acksession.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 
 /**
  * Type alias for entry provider installers used in modular navigation.
@@ -24,4 +25,4 @@ import androidx.navigation3.runtime.EntryProviderScope
  * }
  * ```
  */
-typealias EntryProviderInstaller = EntryProviderScope<Any>.() -> Unit
+typealias EntryProviderInstaller = EntryProviderScope<NavKey>.() -> Unit

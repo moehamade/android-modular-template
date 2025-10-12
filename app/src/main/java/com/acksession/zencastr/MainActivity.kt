@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
@@ -11,9 +12,9 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.acksession.navigation.AppDestinations
 import com.acksession.navigation.EntryProviderInstaller
 import com.acksession.navigation.Navigator
+import com.acksession.navigation.RecordingRoute
 import com.acksession.ui.theme.ZencastrTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -27,6 +28,9 @@ import javax.inject.Inject
  *
  * Each feature module self-registers its navigation destinations using
  * Hilt's @IntoSet annotation, allowing for a modular navigation architecture.
+ *
+ * Features define their routes in sealed interfaces (e.g., ProfileRoute, RecordingRoute)
+ * and provide extension functions for type-safe navigation.
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -42,14 +46,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         // Initialize navigator with the recording screen as start destination
-        navigator.initialize(AppDestinations.Recording)
+        navigator.initialize(RecordingRoute.Recording)
 
         setContent {
             ZencastrTheme {
                 Scaffold { paddingValues ->
                     NavDisplay(
                         backStack = navigator.backStack,
-                        modifier = Modifier.padding(paddingValues),
+                        modifier = Modifier.consumeWindowInsets(paddingValues),
                         onBack = {
                             // Handle back navigation
                             if (!navigator.navigateBack()) {

@@ -1,6 +1,5 @@
 plugins {
     id("zencastr.android.feature")
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -8,5 +7,6 @@ android {
 }
 
 dependencies {
-    // No additional dependencies needed for this test feature
+    // Profile API for routes
+    api(project(":feature:profile:api"))
 }

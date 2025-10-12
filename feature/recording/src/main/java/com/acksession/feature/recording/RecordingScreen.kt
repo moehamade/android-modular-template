@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -24,7 +25,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.acksession.feature.profile.navigation.ProfileDestination
+import com.acksession.feature.profile.api.navigateToProfile
+import com.acksession.feature.profile.api.openProfileDialog
 import com.acksession.navigation.Navigator
 import com.acksession.ui.utils.openAppSettings
 
@@ -85,12 +87,10 @@ fun RecordingScreen(
             // Test navigation button - navigate to Profile with parameters
             FloatingActionButton(
                 onClick = {
-                    navigator.navigateTo(
-                        ProfileDestination(
-                            userId = "USER_123",
-                            name = "Test User",
-                            role = "Video Creator"
-                        )
+                    navigator.navigateToProfile(
+                        userId = "USER_123",
+                        name = "Test User",
+                        role = "Video Creator"
                     )
                 },
                 modifier = Modifier.padding(16.dp)
@@ -107,7 +107,7 @@ fun RecordingScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .consumeWindowInsets(paddingValues)
                 ) {
                     // Camera preview
                     CameraPreview(
