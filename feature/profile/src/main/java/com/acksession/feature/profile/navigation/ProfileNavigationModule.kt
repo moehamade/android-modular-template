@@ -4,7 +4,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.acksession.feature.profile.ProfileScreen
+import com.acksession.feature.profile.ProfileScreenViewModel
 import com.acksession.feature.profile.api.ProfileRoute
 import com.acksession.navigation.EntryProviderInstaller
 import com.acksession.navigation.Navigator
@@ -32,10 +34,13 @@ object ProfileNavigationModule {
     ): EntryProviderInstaller = {
 
         entry<ProfileRoute.Profile> { route ->
+            val profileScreenViewModel: ProfileScreenViewModel = hiltViewModel(
+                creationCallback = { factory: ProfileScreenViewModel.Factory ->
+                    factory.create(route)
+                }
+            )
             ProfileScreen(
-                userId = route.userId,
-                name = route.name,
-                role = route.role,
+                profileScreenViewModel = profileScreenViewModel,
                 navigator = navigator
             )
         }

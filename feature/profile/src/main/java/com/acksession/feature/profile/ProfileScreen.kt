@@ -13,10 +13,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.acksession.navigation.Navigator
 
 /**
@@ -27,18 +29,16 @@ import com.acksession.navigation.Navigator
  * - Displaying parameter data in the UI
  * - Navigating back using the Navigator
  *
- * @param userId User ID passed from the previous screen
- * @param name User name passed from the previous screen
- * @param role Optional user role passed from the previous screen
  * @param navigator Navigator instance for handling back navigation
  */
 @Composable
 fun ProfileScreen(
-    userId: String,
-    name: String,
-    role: String?,
+    profileScreenViewModel: ProfileScreenViewModel,
     navigator: Navigator
 ) {
+
+    val profileState by profileScreenViewModel.profileState.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +76,7 @@ fun ProfileScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = userId,
+                    text = profileState.userId,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -91,7 +91,7 @@ fun ProfileScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = name,
+                    text = profileState.name,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -106,10 +106,10 @@ fun ProfileScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = role ?: "Not specified",
+                    text = profileState.role ?: "Not specified",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = if (role != null) {
+                    color = if (profileState.role != null) {
                         MaterialTheme.colorScheme.onSurface
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
