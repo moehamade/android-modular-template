@@ -9,7 +9,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-
+    implementation(libs.accompanist.permissions)
     api(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.material3)
     api(libs.androidx.compose.ui)
