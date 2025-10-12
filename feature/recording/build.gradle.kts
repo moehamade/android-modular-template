@@ -7,9 +7,8 @@ android {
 }
 
 dependencies {
-    // Core modules
-    implementation(project(":core:permissions"))
-
+    // Permission handling
+    implementation(libs.accompanist.permissions)
     // CameraX dependencies
     implementation(libs.bundles.camerax)
 }

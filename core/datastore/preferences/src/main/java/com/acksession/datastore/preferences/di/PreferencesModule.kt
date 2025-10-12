@@ -4,9 +4,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.acksession.datastore.preferences.PermissionPreferencesRepository
-import com.acksession.datastore.preferences.PermissionPreferencesRepositoryImpl
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,30 +47,4 @@ object PreferencesModule {
     ): DataStore<Preferences> {
         return context.dataStore
     }
-}
-
-/**
- * Hilt module for binding repository interfaces to their implementations.
- *
- * This module uses @Binds instead of @Provides for better performance
- * (no method body needed, Hilt generates the binding code).
- */
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class PreferencesRepositoryModule {
-
-    /**
-     * Binds the PermissionPreferencesRepository interface to its implementation.
-     *
-     * This allows components to depend on the interface while Hilt provides
-     * the concrete implementation automatically.
-     *
-     * @param impl The concrete implementation (injected by Hilt)
-     * @return The interface bound to the implementation
-     */
-    @Binds
-    @Singleton
-    abstract fun bindPermissionPreferencesRepository(
-        impl: PermissionPreferencesRepositoryImpl
-    ): PermissionPreferencesRepository
 }
