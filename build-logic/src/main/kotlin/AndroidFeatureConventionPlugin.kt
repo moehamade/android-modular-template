@@ -34,12 +34,16 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 add("implementation", project.dependencies.project(mapOf("path" to ":core:ui")))
                 add("implementation", project.dependencies.project(mapOf("path" to ":core:domain")))
                 add("implementation", project.dependencies.project(mapOf("path" to ":core:data")))
+                add("implementation", project.dependencies.project(mapOf("path" to ":core:navigation")))
 
                 // Lifecycle dependencies
                 add("implementation", libs.findBundle("lifecycle").get())
 
                 // Hilt navigation compose
                 add("implementation", libs.findLibrary("hilt.navigation.compose").get())
+
+                // Navigation3 dependencies
+                add("implementation", libs.findBundle("navigation3").get())
 
                 // Coroutines
                 add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())

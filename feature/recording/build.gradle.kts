@@ -1,5 +1,6 @@
 plugins {
     id("zencastr.android.feature")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -7,6 +8,9 @@ android {
 }
 
 dependencies {
+    // Profile feature for navigation (routes only)
+    implementation(project(":feature:profile"))
+
     // Permission handling
     implementation(libs.accompanist.permissions)
     // CameraX dependencies
