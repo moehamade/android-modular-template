@@ -1,11 +1,16 @@
 package com.acksession.feature.recording
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import android.net.Uri
 import androidx.camera.core.CameraSelector
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoRecordEvent
+import androidx.camera.view.LifecycleCameraController
+import androidx.camera.view.video.AudioConfig
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +55,30 @@ class RecordingViewModel @Inject constructor(
     fun startRecording(recording: Recording) {
         activeRecording = recording
         _recordingState.value = RecordingState.Recording
+    }
+
+    /**
+     * Start recording with camera controller.
+     * This method handles the camera controller interaction and permission-guarded recording start.
+     *
+     * @param cameraController The camera controller to use for recording
+     * @param context Context for executor
+     * @suppress MissingPermission Permissions are checked before calling this method
+     */
+    @SuppressLint("MissingPermission")
+    fun startRecordingWithController(
+        cameraController: LifecycleCameraController,
+        context: Context
+    ) {
+        val outputOptions = getOutputOptions()
+        val recording = cameraController.startRecording(
+            outputOptions,
+            AudioConfig.create(true),
+            ContextCompat.getMainExecutor(context)
+        ) { event ->
+            handleRecordingEvent(event)
+        }
+        startRecording(recording)
     }
 
     /**
