@@ -43,19 +43,50 @@ Zencastr is an Android application built with Jetpack Compose using a multi-modu
 The project follows a modular architecture with clear separation of concerns:
 
 ```
-:app                  - Main application module, depends on feature modules and :core:ui
-:core:ui              - Shared UI components and design system (theme, colors, typography)
-:core:data            - Data layer (repositories, data sources, Room, network)
-:core:domain          - Business logic layer (models, use cases, domain entities)
-:feature              - Feature modules (future: split into :feature:recording, :feature:playback, etc.)
+:app                        - Main application module, wires features together with Navigation3
+:core:ui                    - Shared UI components and design system (theme, colors, typography)
+:core:navigation            - Navigation3 setup, Navigator wrapper, NavKey definitions
+:core:data                  - Data layer (repositories, data sources, Room, network)
+:core:domain                - Business logic layer (models, use cases, domain entities)
+:core:datastore:preferences - DataStore preferences implementation
+:core:datastore:proto       - Proto DataStore definitions
+:feature:recording          - Recording feature (screen + logic)
+:feature:profile            - Profile feature implementation
+:feature:profile:api        - Profile routes for cross-feature navigation (no UI)
 ```
 
 **Dependency Flow:**
-- `:app` → `:core:ui`, `:feature`
-- `:feature` → `:core:ui`, `:core:domain`, `:core:data`
+- `:app` → feature modules, `:core:ui`, `:core:navigation`
+- `:feature:*` → `:core:ui`, `:core:domain`, `:core:data`, `:core:navigation`
+- `:feature:*:api` → `:core:navigation` only (sealed route interfaces, no implementation)
 - `:core:data` → `:core:domain`
+- `:core:navigation` → standalone (Navigation3 wrappers)
 - `:core:ui` → standalone (only UI/theme)
 - `:core:domain` → pure Kotlin (no Android dependencies)
+
+### Navigation Architecture (Navigation3)
+
+The project uses **Navigation3** with a modular, type-safe navigation pattern:
+
+1. **Route Definitions**: Each feature defines routes in a sealed interface implementing `NavKey` (e.g., `ProfileRoute`, `RecordingRoute`)
+2. **API Modules**: For cross-feature navigation, create `:feature:name:api` modules containing only route definitions (no UI code)
+3. **Hilt Integration**: Features register navigation entries using `@IntoSet` with `EntryProviderInstaller`
+4. **Navigator Wrapper**: `:core:navigation` provides a `Navigator` class wrapping Navigation3's `NavigationController`
+
+**Example route definition** (in `:feature:profile:api`):
+```kotlin
+@Serializable
+sealed interface ProfileRoute : NavKey {
+    @Serializable
+    data class Profile(val userId: String, val name: String) : ProfileRoute
+}
+
+fun Navigator.navigateToProfile(userId: String, name: String) {
+    navigateTo(ProfileRoute.Profile(userId, name))
+}
+```
+
+**Cross-feature navigation**: Features depend on other features' `:api` modules to navigate without coupling to implementations. For example, `:feature:recording` can navigate to profile by depending on `:feature:profile:api` and calling `navigator.navigateToProfile()`.
 
 ### Convention Plugins System
 
@@ -64,6 +95,7 @@ The project follows a modular architecture with clear separation of concerns:
 **Available Plugins:**
 - `zencastr.android.application` - For `:app` module (includes SDK config, test dependencies, Kotlin setup)
 - `zencastr.android.library` - For library modules (same as above, but for libraries)
+- `zencastr.android.feature` - For feature modules (applies library + compose + hilt + core dependencies automatically)
 - `zencastr.android.compose` - Adds Jetpack Compose support (must be applied after application/library plugin)
 - `zencastr.android.hilt` - Adds Hilt dependency injection (KSP + dependencies)
 - `zencastr.android.room` - Adds Room database support (KSP + dependencies)
@@ -89,8 +121,46 @@ The design system lives in `:core:ui` at `com.acksession.ui.theme`:
 
 ## Adding New Modules
 
-1. Create module directory under appropriate category (`core/`, `feature/`, etc.)
-2. Create `build.gradle.kts`:
+### Feature Module (`:feature:*`)
+Use `zencastr.android.feature` which bundles library + compose + hilt + core dependencies:
+
+```kotlin
+plugins {
+    id("zencastr.android.feature")
+}
+
+android {
+    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.feature.featurename"
+}
+
+dependencies {
+    // Feature-specific dependencies only
+    // Core dependencies (:core:ui, :core:domain, :core:data, :core:navigation) are auto-included
+}
+```
+
+### API Module (`:feature:*:api`)
+For navigation routes shared across features:
+
+```kotlin
+plugins {
+    id("zencastr.android.library")
+    alias(libs.plugins.kotlin.serialization)
+}
+
+android {
+    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.feature.featurename.api"
+}
+
+dependencies {
+    api(project(":core:navigation"))
+    api(libs.bundles.navigation3)
+}
+```
+
+### Core/Library Module (`:core:*`)
+For non-feature modules:
+
 ```kotlin
 plugins {
     id("zencastr.android.library")
@@ -106,8 +176,10 @@ dependencies {
     // Module-specific dependencies only
 }
 ```
-3. Add to `settings.gradle.kts`: `include(":category:modulename")`
-4. Create `src/main/AndroidManifest.xml`:
+
+**Final steps for all modules:**
+1. Add to `settings.gradle.kts`: `include(":category:modulename")`
+2. Create `src/main/AndroidManifest.xml`:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -185,9 +257,11 @@ When editing convention plugins in `build-logic/`:
 ## Project Structure Philosophy
 
 - **:core:ui** - Reusable UI components, no business logic
+- **:core:navigation** - Navigation3 wrapper and NavKey interfaces
 - **:core:domain** - Pure Kotlin, business logic, no Android dependencies
 - **:core:data** - Data sources, repositories, Room/Retrofit implementations
-- **:feature** - Feature-specific UI and logic, depends on core modules
-- **:app** - Minimal, just wires everything together
+- **:feature:*** - Feature-specific UI and logic, depends on core modules
+- **:feature:*:api** - Navigation routes only (sealed interfaces, no UI), enables cross-feature navigation
+- **:app** - Minimal, wires features together with Navigation3
 
-Feature modules should be self-contained and depend only on core modules, never on other features.
+**Cross-Feature Navigation Rule**: Feature modules should never depend on other feature modules directly. Instead, depend on the other feature's `:api` module for type-safe navigation. The `:api` module contains only route definitions (sealed interfaces with `@Serializable` and `NavKey`), ensuring features remain decoupled.
