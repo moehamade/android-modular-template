@@ -19,22 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.acksession.navigation.Navigator
 
-/**
- * Profile screen that displays user information passed as navigation parameters.
- *
- * This screen demonstrates:
- * - Receiving type-safe navigation parameters
- * - Displaying parameter data in the UI
- * - Navigating back using the Navigator
- *
- * @param navigator Navigator instance for handling back navigation
- */
 @Composable
 fun ProfileScreen(
     profileScreenViewModel: ProfileScreenViewModel,
-    navigator: Navigator
 ) {
 
     val profileState by profileScreenViewModel.profileState.collectAsStateWithLifecycle()
@@ -131,7 +119,7 @@ fun ProfileScreen(
 
         // Back button
         Button(
-            onClick = { navigator.navigateBack() }
+            onClick = profileScreenViewModel::navigateBack
         ) {
             Text("Go Back to Recording")
         }

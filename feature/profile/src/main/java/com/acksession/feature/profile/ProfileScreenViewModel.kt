@@ -2,6 +2,7 @@ package com.acksession.feature.profile
 
 import androidx.lifecycle.ViewModel
 import com.acksession.feature.profile.api.ProfileRoute
+import com.acksession.navigation.Navigator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 @HiltViewModel(assistedFactory = ProfileScreenViewModel.Factory::class)
 class ProfileScreenViewModel @AssistedInject constructor(
+    private val navigator: Navigator,
     @Assisted private val route: ProfileRoute.Profile
 ) : ViewModel() {
     private val _profileState = MutableStateFlow(
@@ -22,6 +24,8 @@ class ProfileScreenViewModel @AssistedInject constructor(
     )
     val profileState = _profileState.asStateFlow()
 
+
+    fun navigateBack() = navigator.navigateBack()
 
 
     @AssistedFactory

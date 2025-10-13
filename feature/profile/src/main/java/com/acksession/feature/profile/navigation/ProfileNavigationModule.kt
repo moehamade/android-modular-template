@@ -41,7 +41,6 @@ object ProfileNavigationModule {
             )
             ProfileScreen(
                 profileScreenViewModel = profileScreenViewModel,
-                navigator = navigator
             )
         }
 

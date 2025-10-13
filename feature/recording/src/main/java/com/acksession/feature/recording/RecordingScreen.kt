@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.acksession.feature.profile.api.navigateToProfile
-import com.acksession.feature.profile.api.openProfileDialog
 import com.acksession.navigation.Navigator
 import com.acksession.ui.utils.openAppSettings
 
