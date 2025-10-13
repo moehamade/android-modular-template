@@ -37,5 +37,9 @@ gradlePlugin {
             id = "zencastr.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
+        register("featureScaffolding") {
+            id = "zencastr.scaffolding.feature"
+            implementationClass = "FeatureScaffoldingConventionPlugin"
+        }
     }
 }
