@@ -8,7 +8,14 @@ android {
 }
 
 dependencies {
+    // Android core (internal use)
     implementation(libs.androidx.core.ktx)
+
+    // DataStore - internal implementation
     implementation(libs.datastore.preferences)
-    implementation(libs.kotlinx.coroutines.core)
+
+    // Coroutines - exposed in AuthPreferencesDataSource public API (returns Flow)
+    api(libs.kotlinx.coroutines.core)
+
+    implementation(libs.androidx.security.crypto)
 }

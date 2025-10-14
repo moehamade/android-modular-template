@@ -42,6 +42,7 @@ stream-video = "1.13.0"
 # Storage
 room = "2.8.2"
 datastore = "1.1.7"
+security-crypto = "1.1.0-alpha06"
 
 # Background Work
 work = "2.10.5"
@@ -126,6 +127,7 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 
 # Background Work
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
