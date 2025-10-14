@@ -9,6 +9,6 @@ android {
 }
 
 dependencies {
-    // Navigation3 dependencies
-    implementation(libs.bundles.navigation3)
+    // Navigation3 - exposed in public API (navigation components used by consumers)
+    api(libs.bundles.navigation3)
 }
