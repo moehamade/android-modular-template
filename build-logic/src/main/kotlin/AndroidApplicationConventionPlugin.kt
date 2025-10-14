@@ -28,6 +28,10 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             configureKotlin()
             configureTestDependencies()
+
+            dependencies {
+                add("implementation", libraries.findLibrary("timber").get())
+            }
         }
     }
 }

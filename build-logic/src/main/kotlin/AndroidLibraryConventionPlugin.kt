@@ -26,6 +26,11 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             configureKotlin()
             configureTestDependencies()
+
+            // Add Timber logging to all library modules
+            dependencies {
+                add("api", libraries.findLibrary("timber").get())
+            }
         }
     }
 }
