@@ -36,6 +36,16 @@ Zencastr is an Android application built with Jetpack Compose using a multi-modu
 ./gradlew connectedAndroidTest   # Instrumented tests (requires device/emulator)
 ```
 
+### Create new feature module (scaffolding)
+```bash
+./gradlew createFeature -PfeatureName=myfeature
+```
+This automatically creates:
+- `:feature:myfeature` - Feature implementation module
+- `:feature:myfeature:api` - Navigation route definitions
+- Build files, manifests, and NavKey boilerplate
+- Updates `settings.gradle.kts`
+
 ## Architecture
 
 ### Multi-Module Structure
@@ -46,9 +56,10 @@ The project follows a modular architecture with clear separation of concerns:
 :app                        - Main application module, wires features together with Navigation3
 :core:ui                    - Shared UI components and design system (theme, colors, typography)
 :core:navigation            - Navigation3 setup, Navigator wrapper, NavKey definitions
-:core:data                  - Data layer (repositories, data sources, Room, network)
+:core:network               - Network configuration (Retrofit, OkHttp, auth interceptors)
+:core:data                  - Data layer (repositories, data sources, Room)
 :core:domain                - Business logic layer (models, use cases, domain entities)
-:core:datastore:preferences - DataStore preferences implementation
+:core:datastore:preferences - DataStore preferences implementation (token storage)
 :core:datastore:proto       - Proto DataStore definitions
 :feature:recording          - Recording feature (screen + logic)
 :feature:profile            - Profile feature implementation
@@ -56,10 +67,11 @@ The project follows a modular architecture with clear separation of concerns:
 ```
 
 **Dependency Flow:**
-- `:app` → feature modules, `:core:ui`, `:core:navigation`
+- `:app` → feature modules, `:core:ui`, `:core:navigation`, `:core:network`, `:core:data`
 - `:feature:*` → `:core:ui`, `:core:domain`, `:core:data`, `:core:navigation`
 - `:feature:*:api` → `:core:navigation` only (sealed route interfaces, no implementation)
-- `:core:data` → `:core:domain`
+- `:core:data` → `:core:network`, `:core:domain`, `:core:datastore:preferences`
+- `:core:network` → `:core:datastore:preferences` (for token storage)
 - `:core:navigation` → standalone (Navigation3 wrappers)
 - `:core:ui` → standalone (only UI/theme)
 - `:core:domain` → pure Kotlin (no Android dependencies)
@@ -88,6 +100,35 @@ fun Navigator.navigateToProfile(userId: String, name: String) {
 
 **Cross-feature navigation**: Features depend on other features' `:api` modules to navigate without coupling to implementations. For example, `:feature:recording` can navigate to profile by depending on `:feature:profile:api` and calling `navigator.navigateToProfile()`.
 
+### Network and Authentication Architecture
+
+The project uses a clean network architecture with automatic JWT token management to avoid circular dependencies:
+
+**Key Components:**
+1. **`:core:network`** - Provides Retrofit, OkHttpClient, and auth interceptors
+2. **`:core:data`** - Implements API services and token refresh logic
+3. **`:core:datastore:preferences`** - Securely stores JWT tokens
+
+**How Token Refresh Works (No Circular Dependencies):**
+- `AuthInterceptor` (in `:core:network`) automatically adds access tokens to requests
+- `TokenAuthenticator` (in `:core:network`) intercepts 401 responses and refreshes tokens
+- The authenticator depends on a `TokenRefreshCallback` interface (defined in `:core:network`)
+- `:core:data` provides the implementation of `TokenRefreshCallback` using `AuthApiService`
+- This follows the **Dependency Inversion Principle** - network layer depends on abstraction, data layer provides implementation
+
+**Dependency Flow for Network:**
+```
+:core:network (defines TokenRefreshCallback interface)
+    ↓
+:core:data (implements TokenRefreshCallback using AuthApiService)
+```
+No circular dependency! ✅
+
+**Configuration:**
+- API base URL is configured in `:app` module via `BuildConfig.API_BASE_URL`
+- The `:app` module provides `@ApiBaseUrl` via Hilt for injection into Retrofit
+- Network configuration (timeouts, logging) is centralized in `:core:network`
+
 ### Convention Plugins System
 
 **Critical:** This project uses Gradle convention plugins located in `build-logic/` to eliminate boilerplate. All modules use these plugins instead of directly configuring Android/Kotlin settings.
@@ -99,6 +140,7 @@ fun Navigator.navigateToProfile(userId: String, name: String) {
 - `zencastr.android.compose` - Adds Jetpack Compose support (must be applied after application/library plugin)
 - `zencastr.android.hilt` - Adds Hilt dependency injection (KSP + dependencies)
 - `zencastr.android.room` - Adds Room database support (KSP + dependencies)
+- `zencastr.android.network` - Adds networking dependencies (Retrofit, OkHttp, Kotlinx Serialization)
 
 **Configuration Centralization:**
 All Android build constants are in `build-logic/src/main/kotlin/AndroidConfig.kt`:
@@ -258,10 +300,14 @@ When editing convention plugins in `build-logic/`:
 
 - **:core:ui** - Reusable UI components, no business logic
 - **:core:navigation** - Navigation3 wrapper and NavKey interfaces
+- **:core:network** - Network infrastructure (Retrofit, OkHttp, auth interceptors)
 - **:core:domain** - Pure Kotlin, business logic, no Android dependencies
-- **:core:data** - Data sources, repositories, Room/Retrofit implementations
+- **:core:data** - Data sources, repositories, Room database, implements network callbacks
+- **:core:datastore:preferences** - Secure token storage using DataStore
 - **:feature:*** - Feature-specific UI and logic, depends on core modules
 - **:feature:*:api** - Navigation routes only (sealed interfaces, no UI), enables cross-feature navigation
-- **:app** - Minimal, wires features together with Navigation3
+- **:app** - Minimal, wires features together with Navigation3, provides API base URL
 
 **Cross-Feature Navigation Rule**: Feature modules should never depend on other feature modules directly. Instead, depend on the other feature's `:api` module for type-safe navigation. The `:api` module contains only route definitions (sealed interfaces with `@Serializable` and `NavKey`), ensuring features remain decoupled.
+
+**Circular Dependency Prevention**: The `:core:network` module defines interfaces (like `TokenRefreshCallback`) that `:core:data` implements. This follows the Dependency Inversion Principle, preventing circular dependencies while allowing network interceptors to trigger data layer operations.
