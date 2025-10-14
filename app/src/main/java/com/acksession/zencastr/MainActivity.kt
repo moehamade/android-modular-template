@@ -20,16 +20,7 @@ import javax.inject.Inject
 
 /**
  * Main activity that hosts the Navigation3 NavDisplay.
- *
- * Navigation is handled through Hilt dependency injection:
- * - Navigator: Activity-scoped navigation controller
- * - EntryProviderInstallers: Set of feature-provided navigation entries
- *
- * Each feature module self-registers its navigation destinations using
- * Hilt's @IntoSet annotation, allowing for a modular navigation architecture.
- *
- * Features define their routes in sealed interfaces (e.g., ProfileRoute, RecordingRoute)
- * and provide extension functions for type-safe navigation.
+ * Features self-register their navigation destinations using Hilt's @IntoSet annotation.
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

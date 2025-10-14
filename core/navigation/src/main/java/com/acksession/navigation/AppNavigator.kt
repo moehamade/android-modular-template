@@ -41,12 +41,7 @@ interface Navigator {
 
 /**
  * Activity-scoped navigator that manages the navigation back stack.
- *
- * This class provides methods to navigate between destinations in a type-safe manner.
- * Each destination must implement NavKey (typically through sealed interfaces per feature).
- *
- * Features define their own route sealed interfaces (e.g., ProfileRoute, RecordingRoute)
- * and provide extension functions for convenient navigation.
+ * Features define their own route sealed interfaces and provide extension functions for type-safe navigation.
  */
 @ActivityRetainedScoped
 class AppNavigator @Inject constructor() : Navigator {

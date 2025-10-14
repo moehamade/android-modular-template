@@ -30,13 +30,8 @@ import com.acksession.navigation.Navigator
 import com.acksession.ui.utils.openAppSettings
 
 /**
- * Recording screen that shows camera preview and allows video recording.
- *
- * This screen uses a permission gate to ensure camera and microphone permissions
- * are granted before displaying the recording interface.
- *
- * @param navigator Navigator instance for handling navigation to other features
- * @param viewModel ViewModel for managing recording state
+ * Recording screen with camera preview and video recording.
+ * Uses permission gate to ensure camera and microphone permissions are granted.
  */
 @Composable
 fun RecordingScreen(

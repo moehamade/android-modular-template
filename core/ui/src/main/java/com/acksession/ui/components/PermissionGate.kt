@@ -12,33 +12,18 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 /**
  * Generic permission gate that handles requesting and checking multiple permissions.
  *
- * This composable:
- * - Automatically requests permissions on first composition
- * - Shows denied content when permissions are not granted
- * - Shows main content when all permissions are granted
- * - Provides `shouldOpenSettings` flag for permanently denied permissions
- *
  * Usage:
- * ```
+ * ``` kotlin
  * PermissionGate(
  *     permissions = listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
  *     content = { /* Your main UI */ },
- *     deniedContent = { onRequest, shouldOpenSettings ->
- *         if (shouldOpenSettings) {
- *             // Show "Open Settings" button
- *         } else {
- *             // Show "Grant Permission" button that calls onRequest()
- *         }
- *     }
+ *     deniedContent = { onRequest, shouldOpenSettings -> /* Handle denial */ }
  * )
  * ```
  *
  * @param permissions List of Android permissions to request
- * @param content Content to show when all permissions are granted
- * @param deniedContent Content to show when permissions are denied
- *        Parameters:
- *        - onRequest: Callback to re-request permissions (only works if shouldShowRationale = true)
- *        - shouldOpenSettings: Boolean indicating if app settings should be opened (permanent denial)
+ * @param content Content shown when all permissions are granted
+ * @param deniedContent Content shown when permissions are denied
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
