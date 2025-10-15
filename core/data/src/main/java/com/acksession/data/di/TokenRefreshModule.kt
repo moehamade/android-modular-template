@@ -20,6 +20,9 @@ import javax.inject.Singleton
  * - core:network defines the TokenRefreshCallback interface
  * - core:data implements it using AuthApiService
  * - Hilt wires them together at runtime
+ *
+ * Note: Uses runBlocking because OkHttp's Authenticator is synchronous and already
+ * runs on background threads.
  */
 @Module
 @InstallIn(SingletonComponent::class)
