@@ -56,6 +56,7 @@ We follow the Conventional Commits specification to keep our history clean and e
 - **build**: Build system or dependency updates
 - **ci**: CI/CD configuration changes
 - **chore**: Maintenance tasks, tooling updates
+- **revert**: Reverts a previous commit
 
 ### Scope
 
@@ -67,6 +68,8 @@ The scope should reference the module or feature being changed:
 
 ### Examples
 
+**Simple commits:**
+
 ```bash
 feat(recording): add pause/resume functionality
 fix(auth): prevent token refresh loop on 401
@@ -76,6 +79,31 @@ perf(data): cache user profile in memory
 test(profile): add ViewModel state tests
 build: upgrade Compose to 1.6.0
 chore(deps): update Retrofit to 2.9.0
+revert: "feat(auth): add Google login"
+```
+
+**Commit with body:**
+
+```bash
+fix(auth): handle expired tokens gracefully
+
+Previously, when a token expired, the user was logged out immediately.
+Now, we attempt to refresh the token once before logging them out,
+providing a better user experience.
+
+Closes #123
+```
+
+**Commit with breaking change:**
+
+```bash
+feat(api)!: migrate to new authentication flow
+
+BREAKING CHANGE: Clients must now use OAuth2 tokens instead of API keys.
+Update your TokenProvider implementation to return OAuth2 tokens.
+
+Migration guide: docs/MIGRATION.md
+Closes #456
 ```
 
 ### Guidelines
@@ -84,8 +112,16 @@ chore(deps): update Retrofit to 2.9.0
 - Keep the subject line under 72 characters
 - Don't capitalize the first letter of the subject
 - No period at the end of the subject
-- Provide context in the body for non-obvious changes
-- Reference issues: `Closes #123` or `Fixes #456`
+- Use the body to explain **what** and **why**, not **how**
+- Reference issues with `Closes #123`, `Fixes #456`, or `Resolves #789`
+- Mark breaking changes with `!` after the scope or `BREAKING CHANGE:` in footer
+
+### Why Follow This Convention?
+
+- **Automated changelogs**: Tools can generate release notes from commits
+- **Semantic versioning**: Automatically determine version bumps (major/minor/patch)
+- **Better history**: Easy to scan and understand what changed
+- **Team consistency**: Everyone writes commits the same way
 
 ## Code Style
 
@@ -279,15 +315,27 @@ If you encounter circular dependency errors:
 
 ### Build Failures After Dependency Changes
 
-1. Clean build: `./gradlew clean`
-2. Invalidate caches in Android Studio: File → Invalidate Caches → Invalidate and Restart
-3. Check `gradle/libs.versions.toml` for version conflicts
+1. Stop the Gradle daemon: `./gradlew --stop`
+2. Clean build: `./gradlew clean`
+3. Invalidate caches in Android Studio: File → Invalidate Caches → Invalidate and Restart
+4. Check `gradle/libs.versions.toml` for version conflicts
 
 ### KSP Issues
 
 If Hilt or Room generated code isn't found:
-1. Rebuild: `./gradlew clean build`
-2. Ensure KSP plugin is applied in the module's `build.gradle.kts`
+1. Stop Gradle daemon: `./gradlew --stop` (often fixes KSP/Hilt issues)
+2. Rebuild: `./gradlew clean build`
+3. Ensure KSP plugin is applied in the module's `build.gradle.kts`
+4. Check that annotation processors are configured correctly
+
+### Gradle Daemon Issues
+
+If builds are hanging or behaving strangely:
+1. Stop all Gradle daemons: `./gradlew --stop`
+2. Clear Gradle cache: `rm -rf ~/.gradle/caches/`
+3. Sync project again
+
+**Note**: The Gradle daemon can get stuck when KSP or Hilt process large codebases. Stopping it often resolves mysterious build failures.
 
 ## Questions?
 
@@ -298,4 +346,3 @@ If Hilt or Room generated code isn't found:
 ## License
 
 By contributing, you agree that your contributions will be licensed under the same license as the project.
-
