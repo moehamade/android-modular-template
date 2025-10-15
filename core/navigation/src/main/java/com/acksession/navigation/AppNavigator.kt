@@ -44,7 +44,7 @@ interface Navigator {
  * Features define their own route sealed interfaces and provide extension functions for type-safe navigation.
  */
 @ActivityRetainedScoped
-class AppNavigator @Inject constructor() : Navigator {
+internal class AppNavigator @Inject constructor() : Navigator {
 
     private val _backStack: SnapshotStateList<NavKey> = mutableStateListOf()
 
@@ -130,7 +130,7 @@ class AppNavigator @Inject constructor() : Navigator {
 @Suppress("unused")
 @Module
 @InstallIn(ActivityRetainedComponent::class)
-abstract class NavigationModule {
+internal abstract class NavigationModule {
 
     @Binds
     abstract fun bindNavigator(
