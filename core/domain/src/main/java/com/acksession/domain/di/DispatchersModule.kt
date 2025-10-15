@@ -5,7 +5,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -30,12 +32,32 @@ annotation class DefaultDispatcher
 annotation class UnconfinedDispatcher
 
 /**
- * Hilt module providing custom coroutine dispatchers.
+ * Qualifiers for application-level coroutine scopes.
+ * These scopes live for the entire application lifetime and survive component cancellations.
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ApplicationScope
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ApplicationScopeIO
+
+/**
+ * Hilt module providing coroutine infrastructure:
+ * - Dispatchers: Thread pools for different work types (IO, Main, Default, Unconfined)
+ * - Application Scopes: Long-lived coroutine scopes that survive component cancellations
  *
  * Usage in ViewModels/UseCases:
  * ```
+ * // For dispatchers:
  * @Inject constructor(
  *     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+ * )
+ *
+ * // For application scopes:
+ * @Inject constructor(
+ *     @ApplicationScopeIO private val appScope: CoroutineScope
  * )
  * ```
  */
@@ -78,5 +100,61 @@ object DispatchersModule {
     @Singleton
     @UnconfinedDispatcher
     fun provideUnconfinedDispatcher(): CoroutineDispatcher = Dispatchers.Unconfined
-}
 
+    /**
+     * Application-level coroutine scope for I/O operations.
+     *
+     * Uses SupervisorJob so one failed child doesn't cancel others.
+     * Use for operations that involve I/O and should continue even if
+     * the originating scope (ViewModel, Activity) is cancelled:
+     * - Token refresh (network)
+     * - Cache persistence (disk)
+     * - Analytics events (network)
+     * - Background sync (network/disk)
+     *
+     * Example:
+     * ```
+     * applicationScope.launch {
+     *     // This continues even if the calling ViewModel is cleared
+     *     analyticsService.logEvent(event)
+     * }
+     * ```
+     */
+    @Provides
+    @Singleton
+    @ApplicationScopeIO
+    fun provideApplicationScopeIO(
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + ioDispatcher)
+    }
+
+    /**
+     * Application-level coroutine scope for CPU-intensive operations.
+     *
+     * Uses SupervisorJob so one failed child doesn't cancel others.
+     * Use for operations that are CPU-bound and should continue even if
+     * the originating scope is cancelled:
+     * - Large data processing
+     * - Encryption/decryption
+     * - Complex calculations
+     * - Heavy JSON parsing
+     *
+     * Example:
+     * ```
+     * applicationScope.launch {
+     *     // This continues even if the calling ViewModel is cleared
+     *     val processed = processLargeDataset(data)
+     *     saveToCache(processed)
+     * }
+     * ```
+     */
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun provideApplicationScope(
+        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
+    ): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + defaultDispatcher)
+    }
+}
