@@ -19,6 +19,12 @@ Zencastr is an Android application built with Jetpack Compose using a multi-modu
 ./gradlew :core:ui:assemble
 ```
 
+### Build release (with ProGuard/R8)
+```bash
+./gradlew assembleRelease
+./gradlew bundleRelease  # For Play Store AAB
+```
+
 ### Clean build
 ```bash
 ./gradlew clean build
@@ -36,6 +42,12 @@ Zencastr is an Android application built with Jetpack Compose using a multi-modu
 ./gradlew connectedAndroidTest   # Instrumented tests (requires device/emulator)
 ```
 
+### Code quality checks
+```bash
+./gradlew detekt                 # Static analysis
+./gradlew lint                   # Android lint
+```
+
 ### Create new feature module (scaffolding)
 ```bash
 ./gradlew createFeature -PfeatureName=myfeature
@@ -45,6 +57,12 @@ This automatically creates:
 - `:feature:myfeature:api` - Navigation route definitions
 - Build files, manifests, and NavKey boilerplate
 - Updates `settings.gradle.kts`
+
+### Install git hooks
+```bash
+./install-hooks.sh
+```
+This sets up pre-commit hooks that run Detekt and tests automatically.
 
 ## Architecture
 
@@ -59,7 +77,7 @@ The project follows a modular architecture with clear separation of concerns:
 :core:network               - Network configuration (Retrofit, OkHttp, auth interceptors)
 :core:data                  - Data layer (repositories, data sources, Room)
 :core:domain                - Business logic layer (models, use cases, domain entities)
-:core:datastore:preferences - DataStore preferences implementation (token storage)
+:core:datastore:preferences - Encrypted token storage using EncryptedSharedPreferences
 :core:datastore:proto       - Proto DataStore definitions
 :feature:recording          - Recording feature (screen + logic)
 :feature:profile            - Profile feature implementation
@@ -107,7 +125,7 @@ The project uses a clean network architecture with automatic JWT token managemen
 **Key Components:**
 1. **`:core:network`** - Provides Retrofit, OkHttpClient, and auth interceptors
 2. **`:core:data`** - Implements API services and token refresh logic
-3. **`:core:datastore:preferences`** - Securely stores JWT tokens
+3. **`:core:datastore:preferences`** - Securely stores JWT tokens with AES-256-GCM encryption
 
 **How Token Refresh Works (No Circular Dependencies):**
 - `AuthInterceptor` (in `:core:network`) automatically adds access tokens to requests
@@ -129,6 +147,18 @@ No circular dependency! ✅
 - The `:app` module provides `@ApiBaseUrl` via Hilt for injection into Retrofit
 - Network configuration (timeouts, logging) is centralized in `:core:network`
 
+### Security
+
+**Token Storage**:
+- Access tokens and refresh tokens are encrypted using `EncryptedSharedPreferences`
+- Encryption: AES-256-GCM with hardware-backed keys (Android Keystore)
+- Fallback to regular SharedPreferences if encryption fails (logged)
+
+**ProGuard/R8**:
+- Release builds use R8 with comprehensive keep rules
+- Configuration in `app/proguard-rules.pro`
+- Includes rules for Kotlinx Serialization, Retrofit, Room, Hilt, etc.
+
 ### Convention Plugins System
 
 **Critical:** This project uses Gradle convention plugins located in `build-logic/` to eliminate boilerplate. All modules use these plugins instead of directly configuring Android/Kotlin settings.
@@ -142,6 +172,8 @@ No circular dependency! ✅
 - `zencastr.android.room` - Adds Room database support (KSP + dependencies)
 - `zencastr.android.network` - Adds networking dependencies (Retrofit, OkHttp, Kotlinx Serialization)
 
+**Note**: Detekt is applied globally to all subprojects in the root `build.gradle.kts` - no need to apply it per-module.
+
 **Configuration Centralization:**
 All Android build constants are in `build-logic/src/main/kotlin/AndroidConfig.kt`:
 - `COMPILE_SDK = 36`
@@ -152,162 +184,108 @@ All Android build constants are in `build-logic/src/main/kotlin/AndroidConfig.kt
 
 **To change SDK versions or build settings:** Edit `AndroidConfig.kt` - changes apply to all modules automatically.
 
-### Theme and Design System
+## Code Quality
 
-The design system lives in `:core:ui` at `com.acksession.ui.theme`:
-- `Theme.kt` - Material3 theme with dark/light mode and dynamic color support
-- `Color.kt` - Color palette definitions
-- `Type.kt` - Typography definitions
+### Detekt
 
-**Important:** The app uses Compose theming (`ZencastrTheme`), but also requires a minimal XML theme in `/app/src/main/res/values/themes.xml` for the Activity window. Don't delete the XML theme - it's needed for the AndroidManifest.
-
-## Adding New Modules
-
-### Feature Module (`:feature:*`)
-Use `zencastr.android.feature` which bundles library + compose + hilt + core dependencies:
-
-```kotlin
-plugins {
-    id("zencastr.android.feature")
-}
-
-android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.feature.featurename"
-}
-
-dependencies {
-    // Feature-specific dependencies only
-    // Core dependencies (:core:ui, :core:domain, :core:data, :core:navigation) are auto-included
-}
+Static code analysis runs automatically on all modules:
+```bash
+./gradlew detekt
 ```
 
-### API Module (`:feature:*:api`)
-For navigation routes shared across features:
+Configuration: `config/detekt/detekt.yml`
 
-```kotlin
-plugins {
-    id("zencastr.android.library")
-    alias(libs.plugins.kotlin.serialization)
-}
+### Pre-commit Hooks
 
-android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.feature.featurename.api"
-}
-
-dependencies {
-    api(project(":core:navigation"))
-    api(libs.bundles.navigation3)
-}
+Install git hooks to run checks before commits:
+```bash
+./install-hooks.sh
 ```
 
-### Core/Library Module (`:core:*`)
-For non-feature modules:
+Hooks run:
+- Detekt static analysis
+- Unit tests
 
+To bypass (not recommended): `git commit --no-verify`
+
+### CI/CD
+
+GitHub Actions CI runs on every push/PR:
+- Build all modules
+- Run unit tests
+- Run Detekt
+- Run Android Lint
+- Generate release APK
+
+Configuration: `.github/workflows/ci.yml`
+
+## Documentation
+
+### Architecture Decision Records (ADRs)
+
+Located in `docs/architecture/`:
+- ADR-001: Multi-Module Architecture
+- ADR-002: Navigation3 Adoption
+- ADR-003: Token Refresh Strategy
+- ADR-004: Convention Plugins System
+- ADR-005: Encrypted Token Storage
+
+These documents explain **why** architectural decisions were made.
+
+### API Documentation
+
+Located in `docs/api/`:
+- Authentication endpoints (login, register, refresh)
+- User profile management
+- Recording session endpoints
+
+⚠️ **Status**: APIs are currently mocked. Real implementation pending.
+
+### Production Setup
+
+See `docs/PRODUCTION_SETUP.md` for:
+- Generating release keystore
+- Configuring signing
+- Adding Crashlytics
+- Play Store submission
+- Monitoring and troubleshooting
+
+## Production Build Configuration
+
+### Build Optimizations
+
+Gradle performance settings in `gradle.properties`:
+- `org.gradle.parallel=true` - Parallel module builds
+- `org.gradle.caching=true` - Build cache enabled
+- `org.gradle.configureondemand=true` - Configure only needed modules
+- `kotlin.incremental=true` - Incremental Kotlin compilation
+
+### Release Build
+
+Release builds use R8 (ProGuard) for:
+- Code shrinking
+- Code obfuscation
+- Resource shrinking
+
+Enable in `app/build.gradle.kts`:
 ```kotlin
-plugins {
-    id("zencastr.android.library")
-    id("zencastr.android.compose") // if using Compose
-    id("zencastr.android.hilt")    // if using Hilt
-}
-
-android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.modulename"
-}
-
-dependencies {
-    // Module-specific dependencies only
-}
-```
-
-**Final steps for all modules:**
-1. Add to `settings.gradle.kts`: `include(":category:modulename")`
-2. Create `src/main/AndroidManifest.xml`:
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-</manifest>
-```
-
-## Important Patterns
-
-### Namespace Convention
-All modules use `AndroidConfig.NAMESPACE_PREFIX` for consistency:
-- App: `"${AndroidConfig.NAMESPACE_PREFIX}.zencastr"` → `com.acksession.zencastr`
-- Core UI: `"${AndroidConfig.NAMESPACE_PREFIX}.ui"` → `com.acksession.ui`
-- Pattern: `"${AndroidConfig.NAMESPACE_PREFIX}.[modulename]"`
-
-### Module Build Files Should Be Minimal
-Due to convention plugins, a typical module `build.gradle.kts` is ~10-15 lines. Don't add Android configuration blocks (compileSdk, kotlinOptions, etc.) - these are handled by convention plugins.
-
-**Good:**
-```kotlin
-plugins {
-    id("zencastr.android.library")
-}
-
-android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.data"
-}
-
-dependencies {
-    implementation(libs.retrofit)
-}
-```
-
-**Bad (Don't do this):**
-```kotlin
-plugins {
-    id("zencastr.android.library")
-}
-
-android {
-    namespace = "com.acksession.data"
-    compileSdk = 36  // ❌ Already in convention plugin
-
-    kotlinOptions { // ❌ Already in convention plugin
-        jvmTarget = "11"
+buildTypes {
+    release {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        proguardFiles(...)
     }
 }
 ```
 
-### Version Catalog Usage
-Dependencies are managed in `gradle/libs.versions.toml`. Reference them as `libs.dependency.name`:
-```kotlin
-dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.bundles.compose)  // For dependency bundles
-}
+### Signing
+
+Signing configuration in `app/build.gradle.kts` (commented by default).
+
+Create `keystore.properties` (gitignored):
+```properties
+storeFile=../your-keystore.jks
+storePassword=YOUR_PASSWORD
+keyAlias=YOUR_ALIAS
+keyPassword=YOUR_PASSWORD
 ```
-
-### Compose Plugin Order
-The `zencastr.android.compose` plugin MUST be applied AFTER the application/library plugin:
-```kotlin
-plugins {
-    id("zencastr.android.library")     // ✅ First
-    id("zencastr.android.compose")     // ✅ Second
-}
-```
-
-## Modifying Convention Plugins
-
-When editing convention plugins in `build-logic/`:
-1. Make changes in `build-logic/src/main/kotlin/`
-2. Gradle auto-detects changes via `includeBuild("build-logic")`
-3. Sync/rebuild - changes apply to all modules immediately
-4. Test with a single module first: `./gradlew :core:ui:assemble`
-
-## Project Structure Philosophy
-
-- **:core:ui** - Reusable UI components, no business logic
-- **:core:navigation** - Navigation3 wrapper and NavKey interfaces
-- **:core:network** - Network infrastructure (Retrofit, OkHttp, auth interceptors)
-- **:core:domain** - Pure Kotlin, business logic, no Android dependencies
-- **:core:data** - Data sources, repositories, Room database, implements network callbacks
-- **:core:datastore:preferences** - Secure token storage using DataStore
-- **:feature:*** - Feature-specific UI and logic, depends on core modules
-- **:feature:*:api** - Navigation routes only (sealed interfaces, no UI), enables cross-feature navigation
-- **:app** - Minimal, wires features together with Navigation3, provides API base URL
-
-**Cross-Feature Navigation Rule**: Feature modules should never depend on other feature modules directly. Instead, depend on the other feature's `:api` module for type-safe navigation. The `:api` module contains only route definitions (sealed interfaces with `@Serializable` and `NavKey`), ensuring features remain decoupled.
-
-**Circular Dependency Prevention**: The `:core:network` module defines interfaces (like `TokenRefreshCallback`) that `:core:data` implements. This follows the Dependency Inversion Principle, preventing circular dependencies while allowing network interceptors to trigger data layer operations.
