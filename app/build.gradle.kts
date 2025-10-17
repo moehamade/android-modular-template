@@ -16,6 +16,46 @@ android {
         buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com/\"")
     }
 
+    // Signing configuration for release builds
+    // TODO: Add keystore.properties file with:
+    //   storeFile=path/to/keystore.jks
+    //   storePassword=your_store_password
+    //   keyAlias=your_key_alias
+    //   keyPassword=your_key_password
+    signingConfigs {
+        create("release") {
+            // TODO: Uncomment when ready for release
+            // val keystorePropertiesFile = rootProject.file("keystore.properties")
+            // if (keystorePropertiesFile.exists()) {
+            //     val keystoreProperties = java.util.Properties()
+            //     keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+            //     storeFile = file(keystoreProperties["storeFile"] as String)
+            //     storePassword = keystoreProperties["storePassword"] as String
+            //     keyAlias = keystoreProperties["keyAlias"] as String
+            //     keyPassword = keystoreProperties["keyPassword"] as String
+            // }
+        }
+    }
+
+    buildTypes {
+        debug {
+            isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
+
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            // TODO: Uncomment when signing is configured
+            // signingConfig = signingConfigs.getByName("release")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
     buildFeatures {
         buildConfig = true
     }
