@@ -1,4 +1,4 @@
-package com.acksession.data.remote.dto
+package com.acksession.network.dto
 
 import kotlinx.serialization.Serializable
 

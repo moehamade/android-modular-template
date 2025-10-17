@@ -1,7 +1,7 @@
-package com.acksession.data.di
+package com.acksession.network.di
 
-import com.acksession.data.remote.api.AuthApiService
-import com.acksession.data.remote.api.UserApiService
+import com.acksession.network.api.AuthApiService
+import com.acksession.network.api.UserApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

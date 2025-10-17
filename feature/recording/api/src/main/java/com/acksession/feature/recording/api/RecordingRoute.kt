@@ -1,15 +1,17 @@
-package com.acksession.navigation
+package com.acksession.feature.recording.api
 
 import androidx.navigation3.runtime.NavKey
+import com.acksession.navigation.Navigator
 import kotlinx.serialization.Serializable
 
 /**
  * Recording feature navigation routes.
  *
  * This sealed interface defines all navigation destinations within the Recording feature.
- * Kept in :core:navigation as it's the app's starting point.
+ * Other features can depend on :feature:recording:api to navigate to recording screens
+ * without depending on the recording implementation.
  *
- * Note: In a larger app, you could move this to :feature:recording:api for consistency.
+ * All routes are marked with @Serializable for Navigation3 state persistence.
  */
 @Serializable
 sealed interface RecordingRoute : NavKey {
@@ -22,8 +24,12 @@ sealed interface RecordingRoute : NavKey {
 
 /**
  * Extension function for navigating to the recording screen.
+ *
+ * Example:
+ * ```
+ * navigator.navigateToRecording()
+ * ```
  */
 fun Navigator.navigateToRecording() {
     navigateTo(RecordingRoute.Recording)
 }
-

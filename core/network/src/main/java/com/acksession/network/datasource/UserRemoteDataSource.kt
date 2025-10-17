@@ -1,10 +1,10 @@
-package com.acksession.data.remote.datasource
+package com.acksession.network.datasource
 
-import com.acksession.data.remote.api.UserApiService
-import com.acksession.data.remote.dto.UpdateEmailRequest
-import com.acksession.data.remote.dto.UpdatePasswordRequest
-import com.acksession.data.remote.dto.UpdateProfileRequest
-import com.acksession.data.remote.dto.UserDto
+import com.acksession.network.api.UserApiService
+import com.acksession.network.dto.UpdateEmailRequest
+import com.acksession.network.dto.UpdatePasswordRequest
+import com.acksession.network.dto.UpdateProfileRequest
+import com.acksession.network.dto.UserDto
 import javax.inject.Inject
 
 /**

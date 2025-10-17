@@ -1,10 +1,10 @@
-package com.acksession.data.remote.api
+package com.acksession.network.api
 
-import com.acksession.data.remote.dto.ApiResponse
-import com.acksession.data.remote.dto.UpdateEmailRequest
-import com.acksession.data.remote.dto.UpdatePasswordRequest
-import com.acksession.data.remote.dto.UpdateProfileRequest
-import com.acksession.data.remote.dto.UserDto
+import com.acksession.network.dto.ApiResponse
+import com.acksession.network.dto.UpdateEmailRequest
+import com.acksession.network.dto.UpdatePasswordRequest
+import com.acksession.network.dto.UpdateProfileRequest
+import com.acksession.network.dto.UserDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
