@@ -4,12 +4,11 @@ import com.acksession.data.local.datasource.AuthTokenManager
 import com.acksession.data.local.datasource.UserLocalDataSource
 import com.acksession.data.mapper.toDomain
 import com.acksession.data.mapper.toEntity
-import com.acksession.data.remote.datasource.UserRemoteDataSource
+import com.acksession.network.datasource.UserRemoteDataSource
 import com.acksession.domain.model.Result
 import com.acksession.domain.model.User
 import com.acksession.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import timber.log.Timber

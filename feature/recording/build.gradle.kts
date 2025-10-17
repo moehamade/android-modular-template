@@ -7,6 +7,9 @@ android {
 }
 
 dependencies {
+    // Recording API for navigation routes
+    api(project(":feature:recording:api"))
+
     // Profile API for navigation (routes only, no UI dependencies)
     implementation(project(":feature:profile:api"))
 

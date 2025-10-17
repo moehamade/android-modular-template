@@ -50,9 +50,9 @@
 -keep,allowobfuscation,allowshrinking class * implements androidx.navigation3.runtime.NavKey { *; }
 
 # Project-specific: Keep navigation routes (already handled by @Serializable rules above)
-# RecordingRoute in com.acksession.navigation
+# RecordingRoute in com.acksession.feature.recording.api
 # ProfileRoute in com.acksession.feature.profile.api
--keep,allowobfuscation class com.acksession.navigation.RecordingRoute** { *; }
+-keep,allowobfuscation class com.acksession.feature.recording.api.RecordingRoute** { *; }
 -keep,allowobfuscation class com.acksession.feature.profile.api.ProfileRoute** { *; }
 
 # Keep Navigation3 runtime classes

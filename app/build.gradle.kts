@@ -71,6 +71,7 @@ dependencies {
 
     // Feature modules
     implementation(project(":feature:recording"))
+    implementation(project(":feature:recording:api"))
     implementation(project(":feature:profile"))
 
     // Navigation3 (using bundle)

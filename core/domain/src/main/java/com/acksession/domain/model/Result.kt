@@ -31,7 +31,7 @@ sealed class Result<out T> {
     fun getOrThrow(): T = when (this) {
         is Success -> data
         is Error -> throw exception
-        is Loading -> throw IllegalStateException("Cannot get data from Loading state")
+        is Loading -> error("Cannot get data from Loading state")
     }
 }
 

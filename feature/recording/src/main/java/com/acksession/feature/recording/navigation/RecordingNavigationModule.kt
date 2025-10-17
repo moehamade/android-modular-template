@@ -1,9 +1,9 @@
 package com.acksession.feature.recording.navigation
 
 import com.acksession.feature.recording.RecordingScreen
+import com.acksession.feature.recording.api.RecordingRoute
 import com.acksession.navigation.EntryProviderInstaller
 import com.acksession.navigation.Navigator
-import com.acksession.navigation.RecordingRoute
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

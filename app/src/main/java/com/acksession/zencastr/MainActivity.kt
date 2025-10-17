@@ -11,9 +11,9 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.acksession.feature.recording.api.RecordingRoute
 import com.acksession.navigation.EntryProviderInstaller
 import com.acksession.navigation.Navigator
-import com.acksession.navigation.RecordingRoute
 import com.acksession.ui.theme.ZencastrTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

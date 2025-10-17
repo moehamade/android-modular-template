@@ -1,6 +1,6 @@
 package com.acksession.data.mapper
 
-import com.acksession.data.remote.dto.AuthResponse
+import com.acksession.network.dto.AuthResponse
 import com.acksession.domain.model.AuthTokens
 
 /**

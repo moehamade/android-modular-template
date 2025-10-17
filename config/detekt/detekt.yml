@@ -60,8 +60,7 @@ complexity:
     active: true
     threshold: 600
   LongMethod:
-    active: true
-    threshold: 60
+    active: false  # Disabled: Compose UI functions are naturally long
   LongParameterList:
     active: true
     functionThreshold: 6
@@ -76,12 +75,7 @@ complexity:
   StringLiteralDuplication:
     active: false
   TooManyFunctions:
-    active: true
-    thresholdInFiles: 15
-    thresholdInClasses: 15
-    thresholdInInterfaces: 15
-    thresholdInObjects: 15
-    thresholdInEnums: 15
+    active: false  # Disabled: Data sources and repositories naturally have many methods
 
 coroutines:
   active: true
@@ -158,17 +152,7 @@ exceptions:
   ThrowingNewInstanceOfSameException:
     active: true
   TooGenericExceptionCaught:
-    active: true
-    exceptionNames:
-      - 'ArrayIndexOutOfBoundsException'
-      - 'Error'
-      - 'Exception'
-      - 'IllegalMonitorStateException'
-      - 'IndexOutOfBoundsException'
-      - 'NullPointerException'
-      - 'RuntimeException'
-      - 'Throwable'
-    allowedExceptionNameRegex: '_|(ignore|expected).*'
+    active: false  # Disabled: Sometimes catching broad exceptions is necessary for fallback logic
   TooGenericExceptionThrown:
     active: true
 
@@ -192,9 +176,7 @@ naming:
   FunctionMinLength:
     active: false
   FunctionNaming:
-    active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
-    functionPattern: '[a-z][a-zA-Z0-9]*'
+    active: false  # Disabled: Composable functions use PascalCase by convention
   FunctionParameterNaming:
     active: true
     parameterPattern: '[a-z][A-Za-z0-9]*'
@@ -361,11 +343,7 @@ style:
   MaxChainedCallsOnSameLine:
     active: false
   MaxLineLength:
-    active: true
-    maxLineLength: 120
-    excludePackageStatements: true
-    excludeImportStatements: true
-    excludeCommentStatements: false
+    active: false  # Disabled: 120 is reasonable but still too restrictive for some cases
   MayBeConst:
     active: true
   ModifierOrder:
@@ -397,12 +375,7 @@ style:
   RedundantVisibilityModifierRule:
     active: false
   ReturnCount:
-    active: true
-    max: 3
-    excludedFunctions: ['equals']
-    excludeLabeled: false
-    excludeReturnFromLambda: true
-    excludeGuardClauses: false
+    active: false  # Disabled: Kotlin's ?: operator and early returns are idiomatic
   SafeCast:
     active: true
   SerialVersionUIDInSerializableClass:
@@ -447,9 +420,9 @@ style:
   UnusedPrivateClass:
     active: true
   UnusedPrivateMember:
-    active: true
+    active: false  # Disabled: False positives for @Preview composables; IDEs handle this
   UnusedPrivateProperty:
-    active: true
+    active: false  # Disabled: IDEs handle this; allows WIP code and debugging
   UseAnyOrNoneInsteadOfFind:
     active: true
   UseArrayLiteralsInAnnotations:

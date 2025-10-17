@@ -2,8 +2,8 @@ package com.acksession.data.di
 
 import com.acksession.data.local.datasource.AuthTokenManager
 import com.acksession.data.mapper.toAuthTokens
-import com.acksession.data.remote.api.AuthApiService
-import com.acksession.data.remote.dto.RefreshTokenRequest
+import com.acksession.network.api.AuthApiService
+import com.acksession.network.dto.RefreshTokenRequest
 import com.acksession.network.interceptor.TokenRefreshCallback
 import dagger.Module
 import dagger.Provides

@@ -1,7 +1,7 @@
 package com.acksession.data.mapper
 
 import com.acksession.data.local.entity.UserEntity
-import com.acksession.data.remote.dto.UserDto
+import com.acksession.network.dto.UserDto
 import com.acksession.domain.model.User
 
 /**

@@ -1,7 +1,7 @@
 package com.acksession.data.repository
 
 import com.acksession.data.local.datasource.AuthTokenManager
-import com.acksession.data.remote.datasource.AuthRemoteDataSource
+import com.acksession.network.datasource.AuthRemoteDataSource
 import com.acksession.data.mapper.toAuthTokens
 import com.acksession.domain.model.AuthTokens
 import com.acksession.domain.model.Result
