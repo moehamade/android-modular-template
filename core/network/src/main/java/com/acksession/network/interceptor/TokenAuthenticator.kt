@@ -17,6 +17,23 @@ import javax.inject.Singleton
  * 2. Updates stored tokens
  * 3. Retries the failed request with the new access token
  *
+ * **Thread Safety:**
+ * Uses `@Synchronized` to prevent concurrent token refresh attempts when multiple
+ * requests fail with 401 simultaneously. Only one refresh operation proceeds,
+ * others wait and reuse the refreshed token.
+ *
+ * **Infinite Loop Prevention:**
+ * Tracks the authentication attempt chain via `response.priorResponse` to detect
+ * if we're stuck in an infinite retry loop (e.g., server keeps rejecting the new
+ * token). After 3 attempts, gives up and returns null. This does NOT mean we retry
+ * token refresh 3 times - if refresh fails once, we stop immediately.
+ *
+ * **Why 3 attempts?**
+ * - Attempt 1: Original request with expired token → 401
+ * - Attempt 2: Retry with refreshed token → 401 (token still invalid?)
+ * - Attempt 3: Second retry → 401 (definitely something wrong)
+ * - Stop: Return null, let app handle re-authentication
+ *
  * Note: This authenticator delegates the actual refresh logic to a callback
  * that should be provided by the data layer (to avoid circular dependencies).
  *
@@ -30,13 +47,31 @@ class TokenAuthenticator @Inject constructor(
 ) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
-        // Avoid infinite retry loop - if this is already a retry, give up
-        if (response.request.header("Authorization")?.contains("retry") == true) {
-            Timber.e("Token refresh already attempted, failing request")
+        // Prevent infinite loops - if this request already went through auth chain 3+ times, give up
+        if (responseCount(response) >= 3) {
+            Timber.e("Token refresh stuck in loop (3+ auth attempts), failing request")
             return null
         }
 
+        // Synchronize to prevent concurrent refresh attempts (only one thread refreshes)
+        return refreshTokenAndRetry(response)
+    }
+
+    @Synchronized
+    private fun refreshTokenAndRetry(response: Response): Request? {
         try {
+            // Check if token was already refreshed by another thread
+            val currentToken = encryptedAuthStorage.getAccessToken()
+            val requestToken = response.request.header("Authorization")?.removePrefix("Bearer ")
+
+            if (currentToken != null && currentToken != requestToken) {
+                // Token was already refreshed by another concurrent request
+                Timber.d("Token already refreshed by another request, reusing it")
+                return response.request.newBuilder()
+                    .header("Authorization", "Bearer $currentToken")
+                    .build()
+            }
+
             val refreshToken = encryptedAuthStorage.getRefreshToken()
 
             if (refreshToken == null) {
@@ -58,7 +93,7 @@ class TokenAuthenticator @Inject constructor(
 
             // Retry the request with new access token
             return response.request.newBuilder()
-                .header("Authorization", "Bearer $newAccessToken retry")
+                .header("Authorization", "Bearer $newAccessToken")
                 .build()
         } catch (e: Exception) {
             Timber.e(e, "Token refresh failed in authenticator")
@@ -66,6 +101,20 @@ class TokenAuthenticator @Inject constructor(
             encryptedAuthStorage.clearAuthTokens()
             return null
         }
+    }
+
+    /**
+     * Count the number of times this request has been retried.
+     * Uses the response chain to detect retry loops.
+     */
+    private fun responseCount(response: Response): Int {
+        var count = 1
+        var currentResponse = response.priorResponse
+        while (currentResponse != null) {
+            count++
+            currentResponse = currentResponse.priorResponse
+        }
+        return count
     }
 }
 

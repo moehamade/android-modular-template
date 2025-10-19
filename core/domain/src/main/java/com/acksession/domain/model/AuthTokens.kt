@@ -5,8 +5,12 @@ import android.os.SystemClock
 /**
  * Domain model for authentication tokens.
  *
+ * Pure data model without infrastructure concerns (no HTTP, caching, or expiration logic).
+ * Token expiration checking is handled by the network layer (AuthInterceptor) as a
+ * network optimization, not as domain validation.
+ *
  * Uses SystemClock.elapsedRealtime() instead of System.currentTimeMillis() to prevent
- * device time manipulation. Server validates tokens on every request; this is for client-side optimization.
+ * device time manipulation.
  *
  * @property accessToken JWT access token for authenticated API requests
  * @property refreshToken JWT refresh token for obtaining new access tokens
@@ -22,13 +26,16 @@ data class AuthTokens(
     val refreshTokenLifespanMs: Long  // e.g., 7 days = 7 * 24 * 60 * 60 * 1000
 ) {
     companion object {
-        private const val ACCESS_TOKEN_BUFFER_MS = 5 * 60 * 1000L // 5 minutes buffer
-
         /**
          * Create AuthTokens from server response with absolute expiration timestamps.
          *
-         * Note: This assumes server timestamps are in UTC milliseconds.
-         * We convert them to elapsed realtime + lifespan for local validation.
+         * Converts server's UTC timestamps to elapsed realtime + lifespan for storage.
+         * This approach is immune to device time changes (clock adjustments, timezone changes).
+         *
+         * @param accessToken The JWT access token
+         * @param refreshToken The JWT refresh token
+         * @param accessTokenExpiresAtUtc Unix timestamp (ms) when access token expires
+         * @param refreshTokenExpiresAtUtc Unix timestamp (ms) when refresh token expires
          */
         fun fromServerResponse(
             accessToken: String,
@@ -51,52 +58,5 @@ data class AuthTokens(
                 refreshTokenLifespanMs = refreshTokenLifespan
             )
         }
-    }
-
-    /**
-     * Check if access token is expired or will expire soon (within 5 minutes).
-     *
-     * Uses monotonic clock (elapsedRealtime) to prevent device time manipulation.
-     *
-     * @return true if token is expired or expiring soon, false otherwise
-     */
-    fun isAccessTokenExpired(): Boolean {
-        val elapsedSinceIssued = SystemClock.elapsedRealtime() - issuedAt
-        val expirationThreshold = accessTokenLifespanMs - ACCESS_TOKEN_BUFFER_MS
-        return elapsedSinceIssued >= expirationThreshold
-    }
-
-    /**
-     * Check if refresh token is expired.
-     *
-     * Uses monotonic clock (elapsedRealtime) to prevent device time manipulation.
-     *
-     * @return true if token is expired, false otherwise
-     */
-    fun isRefreshTokenExpired(): Boolean {
-        val elapsedSinceIssued = SystemClock.elapsedRealtime() - issuedAt
-        return elapsedSinceIssued >= refreshTokenLifespanMs
-    }
-
-    /**
-     * Get remaining time for access token in milliseconds.
-     *
-     * @return milliseconds until access token expires, or 0 if already expired
-     */
-    fun getRemainingAccessTokenMs(): Long {
-        val elapsedSinceIssued = SystemClock.elapsedRealtime() - issuedAt
-        val remaining = accessTokenLifespanMs - elapsedSinceIssued
-        return remaining.coerceAtLeast(0)
-    }
-
-    /**
-     * Get remaining time for refresh token in milliseconds.
-     *
-     * @return milliseconds until refresh token expires, or 0 if already expired
-     */
-    fun getRemainingRefreshTokenMs(): Long {
-        val elapsedSinceIssued = SystemClock.elapsedRealtime() - issuedAt
-        val remaining = refreshTokenLifespanMs - elapsedSinceIssued
-        return remaining.coerceAtLeast(0)
     }
 }

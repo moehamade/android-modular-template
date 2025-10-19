@@ -14,11 +14,10 @@ import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -39,7 +38,7 @@ import javax.inject.Singleton
  * - Memory cleared on app background (optional)
  *
  * **Performance:**
- * - Zero runBlocking - no thread blocking
+ * - Zero runBlocking - truly non-blocking architecture
  * - Synchronous getters read from memory cache (instant)
  * - Async setters update both cache and DataStore
  * - Industry-standard pattern (used by OAuth2 libraries)
@@ -84,20 +83,32 @@ class TinkAuthStorage @Inject constructor(
     private val refreshTokenCache = AtomicReference<String?>(null)
     private val userIdCache = AtomicReference<String?>(null)
 
+    // Metadata cache (performance optimization - avoids DataStore reads)
+    private val issuedAtCache = AtomicReference(0L)
+    private val accessTokenLifespanCache = AtomicReference(0L)
+    private val refreshTokenLifespanCache = AtomicReference(0L)
+
+    private var cacheCollectionJob: Job? = null
+
     init {
         // Populate cache from DataStore on app start
         // Automatically updates cache when DataStore changes (reactive)
-        scope.launch {
+        cacheCollectionJob = scope.launch {
             dataStore.data.collect { prefs ->
                 try {
                     // Decrypt and update cache
                     accessTokenCache.set(prefs[Keys.ACCESS_TOKEN]?.let { decrypt(it) })
                     refreshTokenCache.set(prefs[Keys.REFRESH_TOKEN]?.let { decrypt(it) })
                     userIdCache.set(prefs[Keys.USER_ID]?.let { decrypt(it) })
+
+                    // Cache metadata (not encrypted)
+                    issuedAtCache.set(prefs[Keys.ISSUED_AT] ?: 0L)
+                    accessTokenLifespanCache.set(prefs[Keys.ACCESS_TOKEN_LIFESPAN] ?: 0L)
+                    refreshTokenLifespanCache.set(prefs[Keys.REFRESH_TOKEN_LIFESPAN] ?: 0L)
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to decrypt tokens during cache sync")
-                    // Clear cache on decryption failure (corrupted data)
-                    clearMemoryCache()
+                    // Clear all data on decryption failure (corrupted data)
+                    clearAll()
                 }
             }
         }
@@ -169,6 +180,12 @@ class TinkAuthStorage @Inject constructor(
         accessTokenLifespanMs: Long,
         refreshTokenLifespanMs: Long
     ) {
+        // Update cache immediately for instant access
+        issuedAtCache.set(issuedAt)
+        accessTokenLifespanCache.set(accessTokenLifespanMs)
+        refreshTokenLifespanCache.set(refreshTokenLifespanMs)
+
+        // Persist to DataStore
         dataStore.edit { prefs ->
             prefs[Keys.ISSUED_AT] = issuedAt
             prefs[Keys.ACCESS_TOKEN_LIFESPAN] = accessTokenLifespanMs
@@ -176,24 +193,23 @@ class TinkAuthStorage @Inject constructor(
         }
     }
 
-    fun getIssuedAt(): Long {
-        // Metadata not cached (less frequently accessed)
-        return runBlocking {
-            dataStore.data.map { it[Keys.ISSUED_AT] ?: 0L }.first()
-        }
-    }
+    /**
+     * Get token issued timestamp (synchronous).
+     * Reads from in-memory cache - no disk I/O.
+     */
+    fun getIssuedAt(): Long = issuedAtCache.get()
 
-    fun getAccessTokenLifespan(): Long {
-        return runBlocking {
-            dataStore.data.map { it[Keys.ACCESS_TOKEN_LIFESPAN] ?: 0L }.first()
-        }
-    }
+    /**
+     * Get access token lifespan in milliseconds (synchronous).
+     * Reads from in-memory cache - no disk I/O.
+     */
+    fun getAccessTokenLifespan(): Long = accessTokenLifespanCache.get()
 
-    fun getRefreshTokenLifespan(): Long {
-        return runBlocking {
-            dataStore.data.map { it[Keys.REFRESH_TOKEN_LIFESPAN] ?: 0L }.first()
-        }
-    }
+    /**
+     * Get refresh token lifespan in milliseconds (synchronous).
+     * Reads from in-memory cache - no disk I/O.
+     */
+    fun getRefreshTokenLifespan(): Long = refreshTokenLifespanCache.get()
 
     // ==================== User ID ====================
 
@@ -282,6 +298,18 @@ class TinkAuthStorage @Inject constructor(
         accessTokenCache.set(null)
         refreshTokenCache.set(null)
         userIdCache.set(null)
+        issuedAtCache.set(0L)
+        accessTokenLifespanCache.set(0L)
+        refreshTokenLifespanCache.set(0L)
+    }
+
+    /**
+     * Cancel the DataStore collection job.
+     * Call this when cleaning up resources (e.g., for testing).
+     */
+    fun cancelCacheSync() {
+        cacheCollectionJob?.cancel()
+        cacheCollectionJob = null
     }
 
     // ==================== Authentication Status ====================

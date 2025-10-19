@@ -14,7 +14,7 @@ dependencies {
     // DataStore - internal implementation
     implementation(libs.datastore.preferences)
 
-    // Coroutines - exposed in AuthPreferencesDataSource public API (returns Flow)
+    // Coroutines - exposed in TinkAuthStorage public API (returns Flow)
     api(libs.kotlinx.coroutines.core)
 
     // Tink for encryption

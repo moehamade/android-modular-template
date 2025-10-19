@@ -10,6 +10,16 @@ import javax.inject.Singleton
 /**
  * Token manager for authentication operations.
  * Converts between storage layer (TinkAuthStorage) and domain models (AuthTokens).
+ *
+ * **Thread Safety:**
+ * All methods are thread-safe. Synchronous getters (`getAccessToken()`, `getRefreshToken()`)
+ * read from atomic in-memory cache and are safe to call from any thread, including
+ * OkHttp interceptor threads. Suspend functions update both cache and DataStore atomically.
+ *
+ * **Performance:**
+ * - Synchronous methods (getAccessToken, getRefreshToken): Instant, no I/O (reads from cache)
+ * - Suspend methods (saveAuthTokens): Updates cache immediately, persists to DataStore async
+ * - Flow methods (getAuthTokens, getCurrentUserId): Reactive, emits from DataStore
  */
 @Singleton
 class AuthTokenManager @Inject constructor(
