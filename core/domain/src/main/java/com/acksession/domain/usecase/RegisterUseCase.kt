@@ -1,6 +1,7 @@
 package com.acksession.domain.usecase
 
-import com.acksession.domain.di.IoDispatcher
+import com.acksession.common.di.qualifiers.Dispatcher
+import com.acksession.common.di.qualifiers.ZencastrDispatchers
 import com.acksession.domain.model.Result
 import com.acksession.domain.model.User
 import com.acksession.domain.repository.AuthRepository
@@ -15,7 +16,7 @@ import javax.inject.Inject
 class RegisterUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:Dispatcher(ZencastrDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(
         email: String,

@@ -14,5 +14,8 @@ dependencies {
     // Coroutines - exposed in public API (repository interfaces return Flow)
     api(libs.kotlinx.coroutines.core)
 
+    // Common - for dispatcher qualifiers in use cases
+    implementation(project(":core:common"))
+
     // Note: kotlin-stdlib is included by default in Kotlin projects
 }

@@ -23,6 +23,7 @@ dependencyResolutionManagement {
 rootProject.name = "Zencastr"
 include(":app")
 include(":core:ui")
+include(":core:common")
 include(":core:data")
 include(":core:domain")
 include(":core:navigation")

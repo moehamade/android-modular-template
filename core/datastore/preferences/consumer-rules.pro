@@ -1,15 +1,14 @@
 # ================================================================================================
 # :core:datastore:preferences Module - ProGuard Rules
 # ================================================================================================
-# This module provides encrypted token storage using EncryptedSharedPreferences.
+# This module provides encrypted token storage using Google Tink + DataStore.
 # These rules ensure encryption (Tink) and secure storage work correctly after R8 optimization.
 
 # ================================================================================================
-# AndroidX Security Crypto (EncryptedSharedPreferences)
+# Google Tink Crypto Library
 # ================================================================================================
-# Keep encryption classes - critical for token storage
+# Keep Tink encryption classes - critical for token storage
 
--keep class androidx.security.crypto.** { *; }
 -keep class com.google.crypto.tink.** { *; }
 
 # Tink has optional dependencies that are not included - suppress warnings
@@ -30,7 +29,7 @@
 -dontwarn org.joda.time.Instant
 
 # Project-specific: Keep encrypted storage classes
--keep class com.acksession.datastore.preferences.EncryptedAuthStorage { *; }
+-keep class com.acksession.datastore.preferences.TinkAuthStorage { *; }
 -keep class com.acksession.datastore.preferences.AuthPreferencesDataSource { *; }
 
 # ================================================================================================

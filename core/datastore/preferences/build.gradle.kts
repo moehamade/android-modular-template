@@ -17,5 +17,9 @@ dependencies {
     // Coroutines - exposed in AuthPreferencesDataSource public API (returns Flow)
     api(libs.kotlinx.coroutines.core)
 
-    implementation(libs.androidx.security.crypto)
+    // Tink for encryption
+    implementation(libs.tink.android)
+
+    // Common - for @ApplicationScopeIO annotation and dispatcher qualifiers
+    implementation(project(":core:common"))
 }
