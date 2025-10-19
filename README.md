@@ -49,7 +49,52 @@ zencastr/
 - JDK 11 or higher
 - Android SDK (API 30+)
 
-### Setup
+### Using as a Template
+
+This project is designed to be used as a template for new Android projects. To rebrand it for your own project:
+
+#### Quick Rebrand
+
+Use the included rebrand script to automatically rename the entire project:
+
+```bash
+# Interactive mode (recommended for first-time users)
+./rebrand.sh
+
+# Command-line mode
+./rebrand.sh --project-name MyApp \
+             --package-name com.example.myapp \
+             --app-name "My App"
+
+# Preview changes without applying (dry run)
+./rebrand.sh --project-name MyApp \
+             --package-name com.example.myapp \
+             --app-name "My App" \
+             --dry-run
+
+# Rebrand and reset git history (fresh start)
+./rebrand.sh --project-name MyApp \
+             --package-name com.example.myapp \
+             --app-name "My App" \
+             --reset-git
+```
+
+The script will:
+- Replace all package names (`com.acksession` → `com.yourcompany.yourapp`)
+- Rename the project (`Zencastr` → `YourProjectName`)
+- Update app display name in resources
+- Rename package directory structure
+- Update all documentation references
+- Validate the build to ensure everything compiles
+- Optionally reset git history for a fresh start
+
+**After rebranding:**
+1. Review changes with `git diff`
+2. Test the app thoroughly
+3. Update any custom configurations (API keys, signing, etc.)
+4. Commit: `git add . && git commit -m "Rebrand to MyApp"`
+
+#### Manual Setup (if not using rebrand script)
 
 1. Clone the repository:
 ```bash
@@ -176,10 +221,27 @@ If you encounter build issues:
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for more troubleshooting tips.
 
+## Template Features
+
+This project is designed to serve as a production-ready template for Android apps:
+
+- **Automatic Rebranding** - One-command script to rename entire project
+- **Convention Plugins** - Centralized build configuration for consistency
+- **Multi-Module Architecture** - Scalable, maintainable code structure
+- **Type-Safe Navigation** - Navigation3 with sealed routes and API modules
+- **Clean Network Layer** - JWT auth with automatic token refresh
+- **Security Built-In** - Encrypted token storage, ProGuard configuration
+- **CI/CD Ready** - GitHub Actions workflow included
+- **Code Quality** - Detekt, git hooks, and testing infrastructure
+- **Comprehensive Docs** - ADRs, API docs, and setup guides
+
 ## Documentation
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [CLAUDE.md](CLAUDE.md) - AI assistant development guide
+- [docs/architecture/](docs/architecture/) - Architecture Decision Records (ADRs)
+- [docs/api/](docs/api/) - API documentation
+- [docs/PRODUCTION_SETUP.md](docs/PRODUCTION_SETUP.md) - Production deployment guide
 - Module READMEs - Documentation for each module
 
 ## License

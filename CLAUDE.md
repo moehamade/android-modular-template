@@ -73,11 +73,12 @@ The project follows a modular architecture with clear separation of concerns:
 ```
 :app                        - Main application module, wires features together with Navigation3
 :core:ui                    - Shared UI components and design system (theme, colors, typography)
+:core:common                - Infrastructure (dispatchers, coroutine scopes, DI qualifiers)
 :core:navigation            - Navigation3 setup, Navigator wrapper, NavKey definitions
 :core:network               - Network configuration (Retrofit, OkHttp, auth interceptors)
 :core:data                  - Data layer (repositories, data sources, Room)
 :core:domain                - Business logic layer (models, use cases, domain entities)
-:core:datastore:preferences - Encrypted token storage using EncryptedSharedPreferences
+:core:datastore:preferences - Encrypted token storage using Google Tink + DataStore
 :core:datastore:proto       - Proto DataStore definitions
 :feature:recording          - Recording feature (screen + logic)
 :feature:profile            - Profile feature implementation
@@ -88,11 +89,13 @@ The project follows a modular architecture with clear separation of concerns:
 - `:app` → feature modules, `:core:ui`, `:core:navigation`, `:core:network`, `:core:data`
 - `:feature:*` → `:core:ui`, `:core:domain`, `:core:data`, `:core:navigation`
 - `:feature:*:api` → `:core:navigation` only (sealed route interfaces, no implementation)
-- `:core:data` → `:core:network`, `:core:domain`, `:core:datastore:preferences`
+- `:core:data` → `:core:network`, `:core:domain`, `:core:datastore:preferences`, `:core:common`
 - `:core:network` → `:core:datastore:preferences` (for token storage)
+- `:core:domain` → `:core:common` (for dispatcher qualifiers in use cases)
+- `:core:datastore:preferences` → `:core:common` (for application scopes)
 - `:core:navigation` → standalone (Navigation3 wrappers)
 - `:core:ui` → standalone (only UI/theme)
-- `:core:domain` → pure Kotlin (no Android dependencies)
+- `:core:common` → standalone (infrastructure only - dispatchers, scopes)
 
 ### Navigation Architecture (Navigation3)
 
@@ -149,10 +152,16 @@ No circular dependency! ✅
 
 ### Security
 
-**Token Storage**:
-- Access tokens and refresh tokens are encrypted using `EncryptedSharedPreferences`
-- Encryption: AES-256-GCM with hardware-backed keys (Android Keystore)
-- Fallback to regular SharedPreferences if encryption fails (logged)
+**Token Storage** (`TinkAuthStorage` in `:core:datastore:preferences`):
+- Access tokens and refresh tokens encrypted using **Google Tink** (production-grade crypto library)
+- Encryption: AES-256-GCM-HKDF via Tink AEAD primitive with hardware-backed keys (Android Keystore)
+- Storage backend: DataStore Preferences (encrypted values stored as Base64)
+- **In-memory cache**: `AtomicReference` for thread-safe synchronous access (OkHttp interceptors)
+- **Performance**: Zero `runBlocking` - synchronous getters read from cache, async setters update DataStore
+- **Memory management**: Cache cleared when app backgrounds (`onTrimMemory()`) to reduce memory dump risk
+- AEAD provides authenticated encryption preventing tampering
+- Replaces deprecated `EncryptedSharedPreferences` (deprecated April 2024)
+- Fail-fast on encryption errors (throws `SecurityException` - no silent fallback to unencrypted storage)
 
 **ProGuard/R8**:
 - Release builds use R8 with comprehensive keep rules
@@ -183,6 +192,67 @@ All Android build constants are in `build-logic/src/main/kotlin/AndroidConfig.kt
 - `NAMESPACE_PREFIX = "com.acksession"`
 
 **To change SDK versions or build settings:** Edit `AndroidConfig.kt` - changes apply to all modules automatically.
+
+## Coroutines and Dispatchers
+
+The project uses a centralized infrastructure module (`:core:common`) for coroutine dispatchers and scopes:
+
+### Type-Safe Dispatcher Injection
+
+```kotlin
+// Instead of old approach with separate annotations:
+@IoDispatcher, @DefaultDispatcher, @MainDispatcher
+
+// Use type-safe enum-based approach:
+@Dispatcher(ZencastrDispatchers.IO)
+@Dispatcher(ZencastrDispatchers.Default)
+@Dispatcher(ZencastrDispatchers.Main)
+@Dispatcher(ZencastrDispatchers.Unconfined)
+```
+
+**Example usage in use cases:**
+```kotlin
+class LoginUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+    @Dispatcher(ZencastrDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
+) {
+    suspend operator fun invoke(email: String, password: String) =
+        withContext(ioDispatcher) {
+            // Login logic
+        }
+}
+```
+
+### Application Scopes
+
+For long-running operations that survive component cancellations:
+
+```kotlin
+@ApplicationScope       // Uses Dispatchers.Default
+@ApplicationScopeIO     // Uses Dispatchers.IO (for DataStore, network, etc.)
+```
+
+**Example usage in TinkAuthStorage:**
+```kotlin
+@Singleton
+class TinkAuthStorage @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val dataStore: DataStore<Preferences>,
+    @ApplicationScopeIO private val scope: CoroutineScope  // For DataStore writes
+) {
+    init {
+        scope.launch {
+            // Populate cache from DataStore (persists across app lifecycle)
+        }
+    }
+}
+```
+
+**Benefits:**
+- Compile-time safety (typo in dispatcher enum = compile error)
+- Self-documenting (`ZencastrDispatchers.IO` is clearer than `@IoDispatcher`)
+- Centralized in `:core:common` - no layering violations
+- Follows Now in Android best practices
 
 ## Code Quality
 
@@ -228,7 +298,8 @@ Located in `docs/architecture/`:
 - ADR-002: Navigation3 Adoption
 - ADR-003: Token Refresh Strategy
 - ADR-004: Convention Plugins System
-- ADR-005: Encrypted Token Storage
+- ADR-005: Encrypted Token Storage (migrated to Tink 2025-10-19)
+- ADR-006: Token Expiration Strategy (proactive refresh with 5-minute buffer)
 
 These documents explain **why** architectural decisions were made.
 

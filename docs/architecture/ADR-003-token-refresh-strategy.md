@@ -151,6 +151,11 @@ class TokenAuthenticator @Inject constructor(
 8. User sees no error ✅
 ```
 
+## Related ADRs
+
+- **[ADR-005: Encrypted Token Storage](ADR-005-encrypted-storage.md)** - How tokens are stored securely (Tink + DataStore)
+- **[ADR-006: Token Expiration Strategy](ADR-006-token-expiration-strategy.md)** - When to check/refresh tokens (proactive vs reactive)
+
 ## References
 
 - [OkHttp Authenticator](https://square.github.io/okhttp/features/authentication/)

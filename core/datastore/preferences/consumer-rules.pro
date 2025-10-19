@@ -30,7 +30,6 @@
 
 # Project-specific: Keep encrypted storage classes
 -keep class com.acksession.datastore.preferences.TinkAuthStorage { *; }
--keep class com.acksession.datastore.preferences.AuthPreferencesDataSource { *; }
 
 # ================================================================================================
 # AndroidX DataStore Preferences 1.1.7
