@@ -1,22 +1,25 @@
 package com.acksession.data.local.datasource
 
-import com.acksession.datastore.preferences.EncryptedAuthStorage
+import com.acksession.datastore.preferences.TinkAuthStorage
 import com.acksession.domain.model.AuthTokens
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * Token manager for authentication operations.
- * Converts between storage layer (EncryptedAuthStorage) and domain models (AuthTokens).
+ * Converts between storage layer (TinkAuthStorage) and domain models (AuthTokens).
  */
 @Singleton
 class AuthTokenManager @Inject constructor(
-    private val encryptedAuthStorage: EncryptedAuthStorage
+    private val encryptedAuthStorage: TinkAuthStorage
 ) {
-    fun saveAuthTokens(tokens: AuthTokens) {
+    /**
+     * Save auth tokens (suspend).
+     * Updates both in-memory cache and encrypted DataStore.
+     */
+    suspend fun saveAuthTokens(tokens: AuthTokens) {
         encryptedAuthStorage.saveAccessToken(tokens.accessToken)
         encryptedAuthStorage.saveRefreshToken(tokens.refreshToken)
         encryptedAuthStorage.saveTokenMetadata(
@@ -53,30 +56,30 @@ class AuthTokenManager @Inject constructor(
     }
 
     /**
-     * Get access token
+     * Get access token (synchronous - from cache)
      */
-    suspend fun getAccessToken(): String? {
-        return encryptedAuthStorage.getAccessTokenFlow().firstOrNull()
+    fun getAccessToken(): String? {
+        return encryptedAuthStorage.getAccessToken()
     }
 
     /**
-     * Get refresh token
+     * Get refresh token (synchronous - from cache)
      */
-    suspend fun getRefreshToken(): String? {
-        return encryptedAuthStorage.getRefreshTokenFlow().firstOrNull()
+    fun getRefreshToken(): String? {
+        return encryptedAuthStorage.getRefreshToken()
     }
 
     /**
-     * Clear all auth tokens
+     * Clear all auth tokens (non-blocking)
      */
     fun clearAuthTokens() {
         encryptedAuthStorage.clearAuthTokens()
     }
 
     /**
-     * Save current user ID
+     * Save current user ID (suspend)
      */
-    fun saveCurrentUserId(userId: String) {
+    suspend fun saveCurrentUserId(userId: String) {
         encryptedAuthStorage.saveCurrentUserId(userId)
     }
 
@@ -88,7 +91,7 @@ class AuthTokenManager @Inject constructor(
     }
 
     /**
-     * Clear current user ID
+     * Clear current user ID (non-blocking)
      */
     fun clearCurrentUserId() {
         encryptedAuthStorage.clearCurrentUserId()

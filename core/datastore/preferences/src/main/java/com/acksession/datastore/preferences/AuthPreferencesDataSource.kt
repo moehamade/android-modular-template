@@ -6,17 +6,17 @@ import javax.inject.Singleton
 
 /**
  * DataStore manager for authentication preferences.
- * Uses EncryptedSharedPreferences for secure token storage with AES256-GCM encryption.
+ * Uses Google Tink for secure token storage with AES256-GCM encryption.
  */
 @Singleton
 class AuthPreferencesDataSource @Inject constructor(
-    private val encryptedAuthStorage: EncryptedAuthStorage
+    private val encryptedAuthStorage: TinkAuthStorage
 ) {
 
     /**
-     * Save access token
+     * Save access token (suspend)
      */
-    fun saveAccessToken(token: String) {
+    suspend fun saveAccessToken(token: String) {
         encryptedAuthStorage.saveAccessToken(token)
     }
 
@@ -28,16 +28,16 @@ class AuthPreferencesDataSource @Inject constructor(
     }
 
     /**
-     * Get access token once (suspend)
+     * Get access token once (synchronous - from cache)
      */
     fun getAccessTokenOnce(): String? {
         return encryptedAuthStorage.getAccessToken()
     }
 
     /**
-     * Save refresh token
+     * Save refresh token (suspend)
      */
-    fun saveRefreshToken(token: String) {
+    suspend fun saveRefreshToken(token: String) {
         encryptedAuthStorage.saveRefreshToken(token)
     }
 
@@ -49,16 +49,16 @@ class AuthPreferencesDataSource @Inject constructor(
     }
 
     /**
-     * Get refresh token once (suspend)
+     * Get refresh token once (synchronous - from cache)
      */
     fun getRefreshTokenOnce(): String? {
         return encryptedAuthStorage.getRefreshToken()
     }
 
     /**
-     * Save all auth tokens at once
+     * Save all auth tokens at once (suspend)
      */
-    fun saveAuthTokens(
+    suspend fun saveAuthTokens(
         accessToken: String,
         refreshToken: String,
         issuedAt: Long,
@@ -124,16 +124,16 @@ class AuthPreferencesDataSource @Inject constructor(
     }
 
     /**
-     * Clear all auth tokens
+     * Clear all auth tokens (non-blocking)
      */
     fun clearAuthTokens() {
         encryptedAuthStorage.clearAuthTokens()
     }
 
     /**
-     * Save current user ID
+     * Save current user ID (suspend)
      */
-    fun saveCurrentUserId(userId: String) {
+    suspend fun saveCurrentUserId(userId: String) {
         encryptedAuthStorage.saveCurrentUserId(userId)
     }
 
@@ -145,14 +145,14 @@ class AuthPreferencesDataSource @Inject constructor(
     }
 
     /**
-     * Clear current user ID
+     * Clear current user ID (non-blocking)
      */
     fun clearCurrentUserId() {
         encryptedAuthStorage.clearCurrentUserId()
     }
 
     /**
-     * Clear all authentication data (tokens + user ID)
+     * Clear all authentication data (tokens + user ID) (non-blocking)
      */
     fun clearAll() {
         encryptedAuthStorage.clearAll()

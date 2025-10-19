@@ -1,6 +1,6 @@
 package com.acksession.network.interceptor
 
-import com.acksession.datastore.preferences.EncryptedAuthStorage
+import com.acksession.datastore.preferences.TinkAuthStorage
 import okhttp3.Interceptor
 import okhttp3.Response
 import timber.log.Timber
@@ -13,7 +13,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class AuthInterceptor @Inject constructor(
-    private val encryptedAuthStorage: EncryptedAuthStorage
+    private val encryptedAuthStorage: TinkAuthStorage
 ) : Interceptor {
 
     companion object {

@@ -1,6 +1,6 @@
 package com.acksession.network.interceptor
 
-import com.acksession.datastore.preferences.EncryptedAuthStorage
+import com.acksession.datastore.preferences.TinkAuthStorage
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
@@ -25,7 +25,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class TokenAuthenticator @Inject constructor(
-    private val encryptedAuthStorage: EncryptedAuthStorage,
+    private val encryptedAuthStorage: TinkAuthStorage,
     private val tokenRefreshCallback: TokenRefreshCallback
 ) : Authenticator {
 
@@ -62,7 +62,7 @@ class TokenAuthenticator @Inject constructor(
                 .build()
         } catch (e: Exception) {
             Timber.e(e, "Token refresh failed in authenticator")
-            // Clear invalid tokens
+            // Clear invalid tokens (non-blocking)
             encryptedAuthStorage.clearAuthTokens()
             return null
         }
