@@ -47,6 +47,13 @@ tink = "1.18.0"
 # Background Work
 work = "2.10.5"
 
+# Firebase
+firebase-bom = "34.4.0"
+
+# Monitoring & Debug Tools
+leakcanary = "2.14"
+chucker = "4.2.0"
+
 # Utilities
 timber = "5.0.1"
 coil = "2.7.0"
@@ -131,6 +138,19 @@ tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "
 # Background Work
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 
+# Firebase (using BOM for version management)
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-perf = { module = "com.google.firebase:firebase-perf" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+firebase-config = { module = "com.google.firebase:firebase-config" }
+
+# Monitoring & Debug Tools
+leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
+chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
+chucker-no-op = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
+
 # Utilities
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
@@ -153,6 +173,9 @@ kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 ksp-gradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 room-gradlePlugin = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
+google-services-gradlePlugin = { module = "com.google.gms:google-services", version = "4.4.2" }
+firebase-crashlytics-gradlePlugin = { module = "com.google.firebase:firebase-crashlytics-gradle", version = "3.0.2" }
+firebase-perf-gradlePlugin = { module = "com.google.firebase:perf-plugin", version = "1.4.2" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -165,6 +188,9 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 room = { id = "androidx.room", version.ref = "room" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }
+firebase-perf = { id = "com.google.firebase.firebase-perf", version = "1.4.2" }
 
 [bundles]
 compose = [
@@ -214,4 +240,10 @@ navigation3 = [
     "androidx-navigation3-ui",
     "androidx-lifecycle-viewmodel-navigation3",
     "kotlinx-serialization-core"
+]
+
+firebase = [
+    "firebase-crashlytics",
+    "firebase-analytics",
+    "firebase-perf"
 ]
