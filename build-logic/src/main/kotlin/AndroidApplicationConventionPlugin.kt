@@ -1,6 +1,7 @@
 import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.internal.extensions.core.extra
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
@@ -21,8 +22,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                 defaultConfig {
                     targetSdk = AndroidConfig.TARGET_SDK
-                    versionCode = AndroidConfig.VERSION_CODE
-                    versionName = AndroidConfig.VERSION_NAME
+                    versionCode = rootProject.extra["versionCode"] as Int
+                    versionName = rootProject.extra["versionName"] as String
                 }
             }
 

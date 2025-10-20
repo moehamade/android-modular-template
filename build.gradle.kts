@@ -1,4 +1,20 @@
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import java.util.Properties
+
+// Load version from version.properties
+val versionPropsFile = file("version.properties")
+val versionProps = Properties().apply {
+    if (versionPropsFile.exists()) {
+        load(versionPropsFile.inputStream())
+    }
+}
+
+// Make version info available to all subprojects
+extra["versionMajor"] = versionProps.getProperty("VERSION_MAJOR", "1").toInt()
+extra["versionMinor"] = versionProps.getProperty("VERSION_MINOR", "0").toInt()
+extra["versionPatch"] = versionProps.getProperty("VERSION_PATCH", "0").toInt()
+extra["versionCode"] = versionProps.getProperty("VERSION_CODE", "1").toInt()
+extra["versionName"] = "${extra["versionMajor"]}.${extra["versionMinor"]}.${extra["versionPatch"]}"
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
