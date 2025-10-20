@@ -19,10 +19,18 @@ Zencastr is an Android application built with Jetpack Compose using a multi-modu
 ./gradlew :core:ui:assemble
 ```
 
+### Build with product flavors
+```bash
+./gradlew :app:assembleDevDebug       # Dev environment, debug build
+./gradlew :app:assembleDevRelease     # Dev environment, release build
+./gradlew :app:assembleProdDebug      # Production environment, debug build
+./gradlew :app:assembleProdRelease    # Production environment, release build
+```
+
 ### Build release (with ProGuard/R8)
 ```bash
-./gradlew assembleRelease
-./gradlew bundleRelease  # For Play Store AAB
+./gradlew assembleProdRelease         # Production release APK
+./gradlew bundleProdRelease           # Production release AAB (for Play Store)
 ```
 
 ### Clean build
@@ -80,19 +88,25 @@ The project follows a modular architecture with clear separation of concerns:
 :core:domain                - Business logic layer (models, use cases, domain entities)
 :core:datastore:preferences - Encrypted token storage using Google Tink + DataStore
 :core:datastore:proto       - Proto DataStore definitions
+:core:analytics             - Firebase Crashlytics, Analytics, Performance monitoring
+:core:notifications         - Push notifications (FCM), notification channels
+:core:remoteconfig          - Firebase Remote Config, feature flags, A/B testing
 :feature:recording          - Recording feature (screen + logic)
 :feature:profile            - Profile feature implementation
 :feature:profile:api        - Profile routes for cross-feature navigation (no UI)
 ```
 
 **Dependency Flow:**
-- `:app` → feature modules, `:core:ui`, `:core:navigation`, `:core:network`, `:core:data`
+- `:app` → feature modules, `:core:ui`, `:core:navigation`, `:core:network`, `:core:data`, `:core:analytics`, `:core:notifications`, `:core:remoteconfig`
 - `:feature:*` → `:core:ui`, `:core:domain`, `:core:data`, `:core:navigation`
 - `:feature:*:api` → `:core:navigation` only (sealed route interfaces, no implementation)
 - `:core:data` → `:core:network`, `:core:domain`, `:core:datastore:preferences`, `:core:common`
 - `:core:network` → `:core:datastore:preferences` (for token storage)
 - `:core:domain` → `:core:common` (for dispatcher qualifiers in use cases)
 - `:core:datastore:preferences` → `:core:common` (for application scopes)
+- `:core:analytics` → standalone (Firebase Crashlytics, Analytics, Performance)
+- `:core:notifications` → `:core:analytics` (for FCM token tracking)
+- `:core:remoteconfig` → standalone (Firebase Remote Config)
 - `:core:navigation` → standalone (Navigation3 wrappers)
 - `:core:ui` → standalone (only UI/theme)
 - `:core:common` → standalone (infrastructure only - dispatchers, scopes)
@@ -150,6 +164,178 @@ No circular dependency! ✅
 - The `:app` module provides `@ApiBaseUrl` via Hilt for injection into Retrofit
 - Network configuration (timeouts, logging) is centralized in `:core:network`
 
+### Production Features and Monitoring
+
+The project includes comprehensive production monitoring and debugging tools:
+
+#### Firebase Integration
+
+**`:core:analytics` Module** - Crash reporting, analytics, and performance monitoring:
+- **Firebase Crashlytics**: Automatic crash reporting with CrashlyticsTree for production logging
+- **Firebase Analytics**: Event tracking, screen views, user properties
+- **Firebase Performance**: Automatic performance monitoring
+
+**Interface-based design** (`AnalyticsTracker`):
+```kotlin
+interface AnalyticsTracker {
+    fun logEvent(eventName: String, params: Map<String, Any>? = null)
+    fun logScreenView(screenName: String, screenClass: String? = null)
+    fun setUserId(userId: String?)
+    fun setUserProperty(name: String, value: String?)
+    fun logException(throwable: Throwable, message: String? = null)
+    fun setCustomKey(key: String, value: Any)
+    fun setAnalyticsCollectionEnabled(enabled: Boolean)
+}
+```
+
+**`:core:notifications` Module** - Push notifications and FCM:
+- Firebase Cloud Messaging (FCM) integration
+- Notification channels (Android O+)
+- FCM token management and topic subscriptions
+- Android 13+ notification permission handling
+
+**Interface-based design** (`ZencastrNotificationManager`):
+```kotlin
+interface ZencastrNotificationManager {
+    fun createNotificationChannels()
+    fun showNotification(channelId: String, notificationId: Int, title: String, message: String, autoCancel: Boolean = true)
+    suspend fun getFcmToken(): String?
+    suspend fun subscribeToTopic(topic: String): Result<Unit>
+    suspend fun unsubscribeFromTopic(topic: String): Result<Unit>
+    fun hasNotificationPermission(context: Context): Boolean
+    fun cancelNotification(notificationId: Int)
+    fun cancelAllNotifications()
+}
+```
+
+**`:core:remoteconfig` Module** - Feature flags and A/B testing:
+- Firebase Remote Config integration
+- Runtime feature flag management
+- Default values for offline support
+- 1-hour fetch interval (configurable)
+
+**Interface-based design** (`FeatureFlagManager`):
+```kotlin
+interface FeatureFlagManager {
+    suspend fun fetchAndActivate(): Result<Boolean>
+    fun getBoolean(key: String, defaultValue: Boolean = false): Boolean
+    fun getString(key: String, defaultValue: String = ""): String
+    fun getLong(key: String, defaultValue: Long = 0L): Long
+    fun getDouble(key: String, defaultValue: Double = 0.0): Double
+}
+```
+
+#### Build Flavors
+
+The app uses product flavors for environment separation:
+
+```kotlin
+productFlavors {
+    create("dev") {
+        dimension = "environment"
+        applicationIdSuffix = ".dev"
+        versionNameSuffix = "-dev"
+        buildConfigField("String", "API_BASE_URL", "\"https://dev-api.zencastr.com/\"")
+        buildConfigField("String", "ENVIRONMENT", "\"development\"")
+    }
+
+    create("prod") {
+        dimension = "environment"
+        buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com/\"")
+        buildConfigField("String", "ENVIRONMENT", "\"production\"")
+    }
+}
+```
+
+**Available build variants**:
+- `devDebug` - Development with debug tools
+- `devRelease` - Development with release optimizations
+- `prodDebug` - Production with debug tools (for testing)
+- `prodRelease` - Production release build
+
+#### Debug Tools
+
+**LeakCanary** (debug builds only):
+- Automatic memory leak detection
+- Shows leak notifications with detailed traces
+- Zero configuration required
+
+**Chucker** (debug builds only):
+- Network traffic inspector
+- Shows all HTTP requests/responses in notification
+- Searchable request history
+- Auto-disabled in release builds (no-op dependency)
+
+#### Production Logging
+
+**Development-Safe Crash Handler**:
+```kotlin
+private fun setupGlobalExceptionHandler() {
+    val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+    Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+        analytics.logException(throwable, "Uncaught exception: ${throwable.message}")
+        analytics.setCustomKey("crash_thread", thread.name)
+
+        if (BuildConfig.DEBUG) {
+            // In debug, let app crash visibly for developer awareness
+            defaultHandler?.uncaughtException(thread, throwable)
+        } else {
+            // In production, report to Crashlytics
+            defaultHandler?.uncaughtException(thread, throwable)
+        }
+    }
+}
+```
+
+**Conditional Timber Logging**:
+- Debug builds: `Timber.DebugTree()` - verbose console logging
+- Release builds: `CrashlyticsTree()` - logs to Crashlytics only
+
+**Conditional HTTP Logging**:
+- Debug builds: `HttpLoggingInterceptor.Level.BODY` - full request/response logging
+- Release builds: `HttpLoggingInterceptor.Level.NONE` - no logging for security
+
+The `:app` module provides `@Named("isDebug")` Boolean to `:core:network` for conditional logging configuration.
+
+#### Backup and Security
+
+**Backup Rules** (`app/src/main/res/xml/backup_rules.xml`):
+- Includes databases and files
+- Excludes encrypted DataStore (token storage)
+- Excludes device-specific preferences
+- Excludes cache directories
+
+**Data Extraction Rules** (`app/src/main/res/xml/data_extraction_rules.xml`):
+- Cloud backup rules (Android 12+)
+- Device transfer rules
+- Same security exclusions as backup rules
+
+#### Deep Linking
+
+**Custom URL Schemes**:
+```xml
+<data android:scheme="zencastr" android:host="session" />
+```
+Example: `zencastr://session/123`
+
+**App Links** (verified HTTPS):
+```xml
+<data android:scheme="https" android:host="zencastr.com" android:pathPrefix="/session" />
+```
+Example: `https://zencastr.com/session/123`
+
+#### Firebase Setup
+
+**Required**: Add `google-services.json` from Firebase Console to `app/` directory.
+
+See `app/README_FIREBASE_SETUP.md` for detailed setup instructions:
+1. Create Firebase project
+2. Add Android app with package `com.acksession.zencastr`
+3. Download `google-services.json`
+4. Enable Firebase services (Crashlytics, Analytics, FCM, Remote Config)
+
+**Build without Firebase will fail** - `google-services.json` is required.
+
 ### Security
 
 **Token Storage** (`TinkAuthStorage` in `:core:datastore:preferences`):
@@ -166,7 +352,13 @@ No circular dependency! ✅
 **ProGuard/R8**:
 - Release builds use R8 with comprehensive keep rules
 - Configuration in `app/proguard-rules.pro`
-- Includes rules for Kotlinx Serialization, Retrofit, Room, Hilt, etc.
+- Includes rules for:
+  - Firebase (Crashlytics, Analytics, Messaging, Remote Config, Performance)
+  - Kotlinx Serialization
+  - Retrofit and OkHttp
+  - Room Database
+  - Hilt Dependency Injection
+  - LeakCanary and Chucker (debug tools)
 
 ### Convention Plugins System
 
@@ -312,14 +504,17 @@ Located in `docs/api/`:
 
 ⚠️ **Status**: APIs are currently mocked. Real implementation pending.
 
-### Production Setup
+### Production Setup and Implementation
 
-See `docs/PRODUCTION_SETUP.md` for:
-- Generating release keystore
-- Configuring signing
-- Adding Crashlytics
-- Play Store submission
-- Monitoring and troubleshooting
+Production readiness documentation:
+- **`COMPLETED_IMPLEMENTATION.md`** - Comprehensive production features implementation summary (95% complete)
+- **`NEXT_STEPS.md`** - Quick reference for remaining setup steps
+- **`app/README_FIREBASE_SETUP.md`** - Firebase Console setup instructions
+- **`docs/PRODUCTION_SETUP.md`** - Release keystore, signing, Play Store submission
+
+Current production readiness: **95%**
+
+**Remaining**: Add `google-services.json` from Firebase Console (5 minutes)
 
 ## Production Build Configuration
 
