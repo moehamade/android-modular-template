@@ -1,0 +1,202 @@
+# Fastlane configuration for Zencastr Android app
+# https://docs.fastlane.tools
+
+default_platform(:android)
+
+platform :android do
+  # Before all lanes
+  before_all do
+    ensure_git_status_clean unless ENV["SKIP_GIT_CHECK"]
+  end
+
+  # ===========================
+  # BUILD LANES
+  # ===========================
+
+  desc "Build debug APK for dev environment"
+  lane :build_dev_debug do
+    gradle(
+      task: "clean assembleDevDebug",
+      print_command: true
+    )
+  end
+
+  desc "Build release APK for dev environment"
+  lane :build_dev_release do
+    gradle(
+      task: "clean assembleDevRelease",
+      print_command: true,
+      properties: {
+        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_PATH"],
+        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
+      }
+    )
+  end
+
+  desc "Build release AAB (Android App Bundle) for production"
+  lane :build_prod_release do
+    gradle(
+      task: "clean bundleProdRelease",
+      print_command: true,
+      properties: {
+        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_PATH"],
+        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
+      }
+    )
+  end
+
+  # ===========================
+  # TESTING LANES
+  # ===========================
+
+  desc "Run all unit tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Run Detekt static analysis"
+  lane :detekt do
+    gradle(task: "detekt")
+  end
+
+  desc "Run Android Lint checks"
+  lane :lint do
+    gradle(task: "lint")
+  end
+
+  desc "Run all quality checks (tests + detekt + lint)"
+  lane :quality do
+    test
+    detekt
+    lint
+  end
+
+  # ===========================
+  # DEPLOYMENT LANES
+  # ===========================
+
+  desc "Deploy to internal testing track"
+  lane :deploy_internal do
+    # TODO: Add your Play Store service account JSON path
+    # ENV["SUPPLY_JSON_KEY"] = "path/to/service-account.json"
+
+    build_prod_release
+
+    upload_to_play_store(
+      track: "internal",
+      aab: "app/build/outputs/bundle/prodRelease/app-prod-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      json_key: ENV["SUPPLY_JSON_KEY"] # Path to service account JSON
+    )
+  end
+
+  desc "Deploy to beta (closed testing) track"
+  lane :deploy_beta do
+    # TODO: Add your Play Store service account JSON path
+    # ENV["SUPPLY_JSON_KEY"] = "path/to/service-account.json"
+
+    build_prod_release
+
+    upload_to_play_store(
+      track: "beta",
+      aab: "app/build/outputs/bundle/prodRelease/app-prod-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      json_key: ENV["SUPPLY_JSON_KEY"]
+    )
+  end
+
+  desc "Promote beta to production"
+  lane :deploy_production do
+    # TODO: Add your Play Store service account JSON path
+    # ENV["SUPPLY_JSON_KEY"] = "path/to/service-account.json"
+
+    # This promotes the current beta build to production
+    # No new build needed - uses existing beta AAB
+    upload_to_play_store(
+      track: "beta",
+      track_promote_to: "production",
+      skip_upload_aab: true,
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      json_key: ENV["SUPPLY_JSON_KEY"]
+    )
+  end
+
+  # ===========================
+  # SCREENSHOT LANES
+  # ===========================
+
+  desc "Capture screenshots for all locales"
+  lane :screenshots do
+    # TODO: Implement with screengrab or manual process
+    # screengrab(
+    #   locales: ["en-US"],
+    #   clear_previous_screenshots: true
+    # )
+    UI.message("📸 Screenshot capture not yet configured")
+    UI.message("See: https://docs.fastlane.tools/actions/screengrab/")
+  end
+
+  # ===========================
+  # VERSION MANAGEMENT
+  # ===========================
+
+  desc "Bump version code (patch)"
+  lane :bump_patch do
+    # TODO: Implement version bumping
+    # This will be handled by version management system
+    UI.message("🔢 Version bumping will be handled by version management system")
+  end
+
+  desc "Bump version code (minor)"
+  lane :bump_minor do
+    # TODO: Implement version bumping
+    UI.message("🔢 Version bumping will be handled by version management system")
+  end
+
+  desc "Bump version code (major)"
+  lane :bump_major do
+    # TODO: Implement version bumping
+    UI.message("🔢 Version bumping will be handled by version management system")
+  end
+
+  # ===========================
+  # UTILITY LANES
+  # ===========================
+
+  desc "Download metadata from Play Store"
+  lane :download_metadata do
+    # TODO: Add your Play Store service account JSON path
+    download_from_play_store(
+      json_key: ENV["SUPPLY_JSON_KEY"],
+      metadata_path: "./fastlane/metadata"
+    )
+  end
+
+  desc "Clean build artifacts"
+  lane :clean do
+    gradle(task: "clean")
+  end
+
+  # ===========================
+  # ERROR HANDLING
+  # ===========================
+
+  error do |lane, exception|
+    UI.error("❌ Error in lane #{lane}: #{exception.message}")
+    # TODO: Add Slack/Discord notification on error
+    # slack(
+    #   message: "Build failed in lane: #{lane}",
+    #   success: false
+    # )
+  end
+end

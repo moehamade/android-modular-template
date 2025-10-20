@@ -1,0 +1,18 @@
+# Fastlane Appfile configuration
+# https://docs.fastlane.tools/advanced/Appfile/
+
+# Application package name
+# Production flavor uses base package name
+# Dev flavor adds .dev suffix automatically
+package_name("com.acksession.zencastr")
+
+# TODO: Add your Play Store service account JSON key path
+# This is used for automated Play Store uploads
+# Download from: https://console.cloud.google.com/ → IAM & Admin → Service Accounts
+# json_key_file("/path/to/your-service-account.json")
+
+# Alternatively, you can set the JSON key content as an environment variable:
+# json_key_data(ENV["PLAY_STORE_JSON_KEY_DATA"])
+
+# For local development, you can also use:
+# json_key_file(File.expand_path("~/.fastlane/play-store-credentials.json"))

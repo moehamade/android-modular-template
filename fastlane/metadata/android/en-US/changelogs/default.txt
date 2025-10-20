@@ -1,0 +1,4 @@
+• Initial release
+• High-quality podcast recording
+• Remote session support
+• Bug fixes and performance improvements
