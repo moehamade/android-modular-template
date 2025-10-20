@@ -1,0 +1,171 @@
+name: Build Release APKs
+
+on:
+  # Manual trigger for creating release builds
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: 'Build flavor'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+          - both
+        default: 'both'
+
+  # Auto-build on version tags
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Prevent concurrent builds
+concurrency:
+  group: build-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-unsigned-apk:
+    name: Build Unsigned Release APKs
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Create google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
+
+      # ===========================
+      # BUILD DEV RELEASE
+      # ===========================
+
+      - name: Build Dev Release APK
+        if: ${{ github.event.inputs.flavor == 'dev' || github.event.inputs.flavor == 'both' || github.event_name == 'push' }}
+        run: |
+          ./gradlew assembleDevRelease --no-daemon --stacktrace
+
+      - name: Upload Dev Release APK
+        if: ${{ github.event.inputs.flavor == 'dev' || github.event.inputs.flavor == 'both' || github.event_name == 'push' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-release-apk-${{ github.run_number }}
+          path: app/build/outputs/apk/dev/release/*.apk
+          retention-days: 30
+
+      # ===========================
+      # BUILD PROD RELEASE
+      # ===========================
+
+      - name: Build Prod Release APK
+        if: ${{ github.event.inputs.flavor == 'prod' || github.event.inputs.flavor == 'both' || github.event_name == 'push' }}
+        run: |
+          ./gradlew assembleProdRelease --no-daemon --stacktrace
+
+      - name: Upload Prod Release APK
+        if: ${{ github.event.inputs.flavor == 'prod' || github.event.inputs.flavor == 'both' || github.event_name == 'push' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-release-apk-${{ github.run_number }}
+          path: app/build/outputs/apk/prod/release/*.apk
+          retention-days: 30
+
+      # ===========================
+      # VERSION INFO
+      # ===========================
+
+      - name: Get version info
+        id: version
+        run: |
+          VERSION_CODE=$(grep "VERSION_CODE=" version.properties | cut -d'=' -f2)
+          VERSION_NAME=$(grep "VERSION_MAJOR=" version.properties | cut -d'=' -f2).$(grep "VERSION_MINOR=" version.properties | cut -d'=' -f2).$(grep "VERSION_PATCH=" version.properties | cut -d'=' -f2)
+          echo "code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "::notice title=Version::Built v$VERSION_NAME (build $VERSION_CODE)"
+
+      # ===========================
+      # CREATE GITHUB RELEASE (on tag push)
+      # ===========================
+
+      - name: Create GitHub Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Zencastr v${{ steps.version.outputs.name }}
+          body: |
+            ## Zencastr v${{ steps.version.outputs.name }}
+
+            **Build**: ${{ steps.version.outputs.code }}
+            **Type**: Pre-release (unsigned APKs for testing)
+
+            ### Downloads
+            - Dev Release APK - For development/testing
+            - Prod Release APK - For production testing (unsigned)
+
+            ⚠️ **Note**: These are unsigned APKs. Signed builds for Play Store will be available after keystore configuration.
+
+            ### Installation
+            ```bash
+            adb install -r app-dev-release.apk
+            # or
+            adb install -r app-prod-release.apk
+            ```
+          draft: false
+          prerelease: true
+          files: |
+            app/build/outputs/apk/dev/release/*.apk
+            app/build/outputs/apk/prod/release/*.apk
+
+      # ===========================
+      # CLEANUP
+      # ===========================
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: |
+          rm -f app/google-services.json
+
+  # ===========================
+  # BUILD SUMMARY
+  # ===========================
+
+  summary:
+    name: Build Summary
+    needs: build-unsigned-apk
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Job Summary
+        run: |
+          echo "## 🏗️ Build Release APKs - Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status**: ${{ needs.build-unsigned-apk.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- Dev Release APK (unsigned)" >> $GITHUB_STEP_SUMMARY
+          echo "- Prod Release APK (unsigned)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ℹ️ Notes" >> $GITHUB_STEP_SUMMARY
+          echo "- These APKs are **unsigned** and suitable for testing" >> $GITHUB_STEP_SUMMARY
+          echo "- Install via: \`adb install -r app-*.apk\`" >> $GITHUB_STEP_SUMMARY
+          echo "- For signed Play Store builds, configure keystore first" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download APKs from **Artifacts** section above" >> $GITHUB_STEP_SUMMARY
+          echo "2. Test on physical device or emulator" >> $GITHUB_STEP_SUMMARY
+          echo "3. When ready for Play Store, set up keystore and signing" >> $GITHUB_STEP_SUMMARY
