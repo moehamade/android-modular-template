@@ -1,19 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Data extraction rules for Android 12+ (cloud backup and device transfer) -->
 <data-extraction-rules>
+    <!-- Cloud backup configuration (Google Drive, etc.) -->
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <!-- Include user data -->
+        <include domain="database" path="."/>
+        <include domain="file" path="."/>
+
+        <!-- Exclude sensitive data - DataStore contains encrypted tokens -->
+        <exclude domain="sharedpref" path="datastore"/>
+        <exclude domain="file" path="cache"/>
     </cloud-backup>
-    <!--
+
+    <!-- Device-to-device transfer (Quick Switch, etc.) -->
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <!-- Include user data for device transfer -->
+        <include domain="database" path="."/>
+        <include domain="file" path="."/>
+
+        <!-- Exclude sensitive and device-specific data -->
+        <exclude domain="sharedpref" path="datastore"/>
+        <exclude domain="sharedpref" path="device_prefs.xml"/>
+        <exclude domain="file" path="cache"/>
     </device-transfer>
-    -->
 </data-extraction-rules>
