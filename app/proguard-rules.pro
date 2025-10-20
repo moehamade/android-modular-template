@@ -94,3 +94,43 @@
 # Uncomment to print configuration and usage during build (helpful for debugging rules)
 # -printconfiguration build/outputs/mapping/configuration.txt
 # -printusage build/outputs/mapping/usage.txt
+
+# ================================================================================================
+# Firebase Services
+# ================================================================================================
+
+# Firebase Crashlytics
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+-keep class com.google.firebase.crashlytics.** { *; }
+-dontwarn com.google.firebase.crashlytics.**
+
+# Firebase Analytics
+-keep class com.google.android.gms.measurement.** { *; }
+-keep class com.google.firebase.analytics.** { *; }
+
+# Firebase Messaging (FCM)
+-keep class com.google.firebase.messaging.** { *; }
+-keep class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+    public static final *** NULL;
+}
+
+# Firebase Remote Config
+-keep class com.google.firebase.remoteconfig.** { *; }
+-keep class com.google.firebase.abt.** { *; }
+
+# Firebase Performance
+-keep class com.google.firebase.perf.** { *; }
+
+# Firebase Common
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+
+# ================================================================================================
+# Debug Tools (Leakcanary, Chucker)
+# ================================================================================================
+# These are debug-only dependencies and won't be in release builds
+# But adding rules just in case
+
+-dontwarn com.squareup.leakcanary.**
+-dontwarn com.chuckerteam.chucker.**
