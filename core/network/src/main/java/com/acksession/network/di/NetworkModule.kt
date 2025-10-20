@@ -1,5 +1,6 @@
 package com.acksession.network.di
 
+import com.acksession.network.BuildConfig
 import com.acksession.network.qualifier.ApiBaseUrl
 import dagger.Module
 import dagger.Provides
@@ -42,14 +43,24 @@ object NetworkModule {
 
     /**
      * Provides HTTP logging interceptor.
+     *
+     * Logging level is conditional on debug/release build:
+     * - Debug: BODY level (full request/response logging)
+     * - Release: NONE (no logging for security)
+     *
      */
     @Provides
     @Singleton
-    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
+    fun provideHttpLoggingInterceptor(
+    ): HttpLoggingInterceptor {
         return HttpLoggingInterceptor { message ->
             Timber.tag("OkHttp").d(message)
         }.apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
     }
 
