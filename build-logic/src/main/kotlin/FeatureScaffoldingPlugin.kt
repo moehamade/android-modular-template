@@ -92,6 +92,7 @@ abstract class CreateFeatureTask : DefaultTask() {
 
                 // Add feature-specific dependencies here
             }
+
         """.trimIndent())
     }
 
@@ -110,6 +111,7 @@ abstract class CreateFeatureTask : DefaultTask() {
                 api(project(":core:navigation"))
                 api(libs.bundles.navigation3)
             }
+
         """.trimIndent())
     }
 
@@ -126,7 +128,7 @@ abstract class CreateFeatureTask : DefaultTask() {
         val content = """
             package $namespacePrefix.feature.$name.api
 
-            import $namespacePrefix.navigation.NavKey
+            import androidx.navigation3.runtime.NavKey
             import $namespacePrefix.navigation.Navigator
             import kotlinx.serialization.Serializable
 
@@ -139,6 +141,7 @@ abstract class CreateFeatureTask : DefaultTask() {
             fun Navigator.navigateTo$camelCaseName() {
                 navigateTo(${camelCaseName}Route.${camelCaseName}Screen)
             }
+
         """.trimIndent()
         File(apiDir, "src/main/java/$packagePath/${camelCaseName}Route.kt").writeText(content)
     }
@@ -149,6 +152,7 @@ abstract class CreateFeatureTask : DefaultTask() {
 
             include(":feature:$name")
             include(":feature:$name:api")
+
         """.trimIndent())
     }
 }
