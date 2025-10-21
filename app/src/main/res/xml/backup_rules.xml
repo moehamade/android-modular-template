@@ -7,11 +7,15 @@
     <!-- Backup internal files -->
     <include domain="file" path="."/>
 
+    <!-- Backup shared preferences -->
+    <include domain="sharedpref" path="."/>
+
     <!-- Exclude sensitive data -->
     <!-- DataStore contains encrypted tokens - exclude for security -->
-    <exclude domain="sharedpref" path="datastore"/>
+    <!-- DataStore files are in the 'file' domain, not 'sharedpref' -->
+    <exclude domain="file" path="datastore"/>
 
-    <!-- Exclude device-specific preferences -->
+    <!-- Exclude device-specific preferences (if they exist) -->
     <exclude domain="sharedpref" path="device_prefs.xml"/>
 
     <!-- Exclude cache -->

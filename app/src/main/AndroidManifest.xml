@@ -58,9 +58,11 @@
         </activity>
 
         <!-- Firebase Cloud Messaging Service -->
+        <!-- tools:ignore="Instantiatable" - Lint false positive for FirebaseMessagingService -->
         <service
             android:name="com.acksession.notifications.ZencastrFCMService"
-            android:exported="false">
+            android:exported="false"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

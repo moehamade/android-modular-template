@@ -60,6 +60,10 @@ abstract class CreateFeatureTask : DefaultTask() {
         createAndroidManifest(featureDir)
         createAndroidManifest(apiDir)
 
+        // Create Consumer ProGuard Rules
+        createConsumerRules(featureDir)
+        createConsumerRules(apiDir)
+
         // Create NavKey
         createNavKeyFile(apiDir, name, camelCaseName, namespacePrefix)
 
@@ -120,6 +124,19 @@ abstract class CreateFeatureTask : DefaultTask() {
             <?xml version="1.0" encoding="utf-8"?>
             <manifest xmlns:android="http://schemas.android.com/apk/res/android">
             </manifest>
+        """.trimIndent())
+    }
+
+    private fun createConsumerRules(moduleDir: File) {
+        File(moduleDir, "consumer-rules.pro").writeText("""
+            # Add project specific ProGuard rules here.
+            # You can control the set of applied configuration files using the
+            # proguardFiles setting in build.gradle.kts.
+            #
+            # For more details, see
+            #   http://developer.android.com/guide/developing/tools/proguard.html
+
+            # This file is intentionally empty - no special ProGuard rules needed for this module.
         """.trimIndent())
     }
 

@@ -6,9 +6,11 @@
         <!-- Include user data -->
         <include domain="database" path="."/>
         <include domain="file" path="."/>
+        <include domain="sharedpref" path="."/>
 
         <!-- Exclude sensitive data - DataStore contains encrypted tokens -->
-        <exclude domain="sharedpref" path="datastore"/>
+        <!-- DataStore files are in the 'file' domain, not 'sharedpref' -->
+        <exclude domain="file" path="datastore"/>
         <exclude domain="file" path="cache"/>
     </cloud-backup>
 
@@ -17,9 +19,11 @@
         <!-- Include user data for device transfer -->
         <include domain="database" path="."/>
         <include domain="file" path="."/>
+        <include domain="sharedpref" path="."/>
 
         <!-- Exclude sensitive and device-specific data -->
-        <exclude domain="sharedpref" path="datastore"/>
+        <!-- DataStore files are in the 'file' domain, not 'sharedpref' -->
+        <exclude domain="file" path="datastore"/>
         <exclude domain="sharedpref" path="device_prefs.xml"/>
         <exclude domain="file" path="cache"/>
     </device-transfer>
