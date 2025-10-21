@@ -5,6 +5,7 @@ import com.acksession.datastore.preferences.TinkAuthStorage
 import com.acksession.network.config.AuthConfig
 import okhttp3.Interceptor
 import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -101,7 +102,7 @@ class AuthInterceptor @Inject constructor(
             .protocol(okhttp3.Protocol.HTTP_1_1)
             .code(401)
             .message("Unauthorized - Token expired (client-side check)")
-            .body(okhttp3.ResponseBody.create(null, ""))
+            .body("".toResponseBody(null))
             .build()
     }
 }

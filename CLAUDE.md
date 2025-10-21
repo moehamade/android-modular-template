@@ -6,6 +6,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Zencastr is an Android application built with Jetpack Compose using a multi-module architecture following Clean Architecture principles. The project uses Gradle convention plugins to minimize boilerplate and maintain consistency across modules.
 
+## Initial Setup Requirements
+
+**IMPORTANT**: Before building, you MUST have `google-services.json` configured.
+
+### Local Development Setup
+
+1. **Firebase Configuration** (Required for any build):
+   - Create Firebase project at [Firebase Console](https://console.firebase.google.com)
+   - Add Android app with package: `com.acksession.zencastr`
+   - Download `google-services.json` and place in `app/` directory
+   - See `app/README_FIREBASE_SETUP.md` for detailed instructions
+
+2. **Verify Setup**:
+   ```bash
+   ./gradlew :app:assembleDevDebug
+   ```
+
+### CI/CD Setup (GitHub Actions)
+
+Add to GitHub repository secrets (**Settings → Secrets and variables → Actions**):
+- `GOOGLE_SERVICES_JSON` - Base64-encoded `google-services.json` file
+  ```bash
+  cat app/google-services.json | base64 | pbcopy
+  ```
+
+### Optional: Release Signing (for Play Store)
+
+Only needed when ready to publish to Play Store:
+- Generate keystore: See `MANUAL_SETUP_REQUIRED.md`
+- Create `keystore.properties` file (gitignored)
+- Uncomment signing config in `app/build.gradle.kts`
+
+For detailed setup instructions, see `MANUAL_SETUP_REQUIRED.md` and `NEXT_STEPS.md`.
+
 ## Build Commands
 
 ### Build the project
@@ -47,14 +81,24 @@ Zencastr is an Android application built with Jetpack Compose using a multi-modu
 ```bash
 ./gradlew test                    # All unit tests
 ./gradlew :app:test              # App module tests
+./gradlew :app:testDevDebug      # Run tests for specific variant
 ./gradlew connectedAndroidTest   # Instrumented tests (requires device/emulator)
 ```
 
 ### Code quality checks
 ```bash
 ./gradlew detekt                 # Static analysis
-./gradlew lint                   # Android lint
+./gradlew lint                   # Android lint (requires google-services.json)
+./gradlew lintDevDebug           # Lint specific variant
 ```
+
+### Version management
+```bash
+./scripts/bump_version.sh patch  # 1.0.0 → 1.0.1 (bug fixes)
+./scripts/bump_version.sh minor  # 1.0.0 → 1.1.0 (new features)
+./scripts/bump_version.sh major  # 1.0.0 → 2.0.0 (breaking changes)
+```
+Version info stored in `version.properties` and automatically applied to builds.
 
 ### Create new feature module (scaffolding)
 ```bash
@@ -472,14 +516,37 @@ To bypass (not recommended): `git commit --no-verify`
 
 ### CI/CD
 
-GitHub Actions CI runs on every push/PR:
+**CI Workflow** (`.github/workflows/ci.yml`) - Runs on every push/PR:
 - Build all modules
 - Run unit tests
-- Run Detekt
+- Run Detekt static analysis
 - Run Android Lint
-- Generate release APK
+- Assemble dev and prod release APKs
 
-Configuration: `.github/workflows/ci.yml`
+**Build Release APKs Workflow** (`.github/workflows/build-release.yml`) - Manual or on version tags:
+- Builds unsigned release APKs (no keystore required)
+- Supports flavor selection: dev, prod, or both
+- Uploads APK artifacts for download
+- Auto-creates GitHub releases on version tags (v*.*.*)
+- Perfect for testing before Play Store deployment
+
+**Usage**:
+```bash
+# Trigger via GitHub Actions UI:
+# 1. Go to Actions tab → "Build Release APKs"
+# 2. Click "Run workflow"
+# 3. Select flavor (dev/prod/both)
+# 4. Download from artifacts
+
+# Or tag a version:
+git tag v1.0.0
+git push origin v1.0.0
+# Auto-creates release with APKs attached
+```
+
+**Deploy Workflow** (disabled by default):
+- See `MANUAL_SETUP_REQUIRED.md` for enabling Play Store deployment
+- Requires keystore setup and Play Store service account
 
 ## Documentation
 
@@ -507,14 +574,24 @@ Located in `docs/api/`:
 ### Production Setup and Implementation
 
 Production readiness documentation:
-- **`COMPLETED_IMPLEMENTATION.md`** - Comprehensive production features implementation summary (95% complete)
-- **`NEXT_STEPS.md`** - Quick reference for remaining setup steps
+- **`MANUAL_SETUP_REQUIRED.md`** - Step-by-step setup guide (Firebase, keystore, Play Store)
+- **`NEXT_STEPS.md`** - Quick reference and current status
 - **`app/README_FIREBASE_SETUP.md`** - Firebase Console setup instructions
 - **`docs/PRODUCTION_SETUP.md`** - Release keystore, signing, Play Store submission
 
-Current production readiness: **95%**
+**Current Status: 100% Development Ready** 🎉
 
-**Remaining**: Add `google-services.json` from Firebase Console (5 minutes)
+What's working now:
+- ✅ Local builds (requires `google-services.json` setup)
+- ✅ CI/CD pipelines (requires GitHub secret: `GOOGLE_SERVICES_JSON`)
+- ✅ Build unsigned release APKs via GitHub Actions
+- ✅ Firebase integration (Analytics, Crashlytics, FCM, Remote Config)
+- ✅ All production features implemented
+
+What's pending (only for Play Store deployment):
+- ⏳ Keystore generation (when ready to publish)
+- ⏳ Play Store service account (when ready to publish)
+- ⏳ Deploy workflow (currently disabled, enable when ready)
 
 ## Production Build Configuration
 

@@ -1,11 +1,13 @@
 package com.acksession.notifications
 
 import android.Manifest
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -19,7 +21,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ZencastrNotificationManagerImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val analytics: AnalyticsTracker,
     private val firebaseMessaging: FirebaseMessaging
 ) : ZencastrNotificationManager {
@@ -27,31 +29,29 @@ class ZencastrNotificationManagerImpl @Inject constructor(
     private val notificationManager = NotificationManagerCompat.from(context)
 
     override fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channels = listOf(
-                NotificationChannel(
-                    NotificationChannels.CHANNEL_ID_DEFAULT,
-                    NotificationChannels.CHANNEL_NAME_DEFAULT,
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ),
-                NotificationChannel(
-                    NotificationChannels.CHANNEL_ID_RECORDING,
-                    NotificationChannels.CHANNEL_NAME_RECORDING,
-                    NotificationManager.IMPORTANCE_HIGH
-                ),
-                NotificationChannel(
-                    NotificationChannels.CHANNEL_ID_MESSAGES,
-                    NotificationChannels.CHANNEL_NAME_MESSAGES,
-                    NotificationManager.IMPORTANCE_HIGH
-                )
+        val channels = listOf(
+            NotificationChannel(
+                NotificationChannels.CHANNEL_ID_DEFAULT,
+                NotificationChannels.CHANNEL_NAME_DEFAULT,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ),
+            NotificationChannel(
+                NotificationChannels.CHANNEL_ID_RECORDING,
+                NotificationChannels.CHANNEL_NAME_RECORDING,
+                NotificationManager.IMPORTANCE_HIGH
+            ),
+            NotificationChannel(
+                NotificationChannels.CHANNEL_ID_MESSAGES,
+                NotificationChannels.CHANNEL_NAME_MESSAGES,
+                NotificationManager.IMPORTANCE_HIGH
             )
+        )
 
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            channels.forEach { manager.createNotificationChannel(it) }
-            
-            Timber.d("Notification channels created: ${channels.size}")
-            analytics.logEvent("notification_channels_created", mapOf("count" to channels.size))
-        }
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        channels.forEach { manager.createNotificationChannel(it) }
+
+        Timber.d("Notification channels created: ${channels.size}")
+        analytics.logEvent("notification_channels_created", mapOf("count" to channels.size))
     }
 
     override fun showNotification(
@@ -70,6 +70,25 @@ class ZencastrNotificationManagerImpl @Inject constructor(
             .build()
 
         if (hasNotificationPermission(context)) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                ActivityCompat.requestPermissions(
+                    context.applicationContext as Activity,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+                return
+            }
             notificationManager.notify(notificationId, notification)
             Timber.d("Notification shown: $title")
         } else {
