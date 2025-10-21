@@ -74,6 +74,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Create google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
+
       - name: Run Android Lint
         run: ./gradlew lint --no-daemon --stacktrace
 
@@ -105,6 +109,10 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Create google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
 
       - name: Assemble Dev Release APK
         run: ./gradlew assembleDevRelease --no-daemon --stacktrace
