@@ -41,7 +41,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+          gradle-home-cache-cleanup: true
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -50,6 +55,9 @@ jobs:
         run: |
           echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
 
+      - name: Pre-download dependencies
+        run: ./gradlew dependencies --parallel --configuration-cache
+
       # ===========================
       # BUILD DEV RELEASE
       # ===========================
@@ -57,7 +65,7 @@ jobs:
       - name: Build Dev Release APK
         if: ${{ github.event.inputs.flavor == 'dev' || github.event.inputs.flavor == 'both' || github.event_name == 'push' }}
         run: |
-          ./gradlew assembleDevRelease --no-daemon --stacktrace
+          ./gradlew assembleDevRelease --parallel --build-cache --configuration-cache --stacktrace
 
       - name: Upload Dev Release APK
         if: ${{ github.event.inputs.flavor == 'dev' || github.event.inputs.flavor == 'both' || github.event_name == 'push' }}
@@ -74,7 +82,7 @@ jobs:
       - name: Build Prod Release APK
         if: ${{ github.event.inputs.flavor == 'prod' || github.event.inputs.flavor == 'both' || github.event_name == 'push' }}
         run: |
-          ./gradlew assembleProdRelease --no-daemon --stacktrace
+          ./gradlew assembleProdRelease --parallel --build-cache --configuration-cache --stacktrace
 
       - name: Upload Prod Release APK
         if: ${{ github.event.inputs.flavor == 'prod' || github.event.inputs.flavor == 'both' || github.event_name == 'push' }}

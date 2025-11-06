@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build & Test
+  build-and-test:
+    name: Build, Test & Lint
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -27,7 +27,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+          gradle-home-cache-cleanup: true
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -36,50 +41,49 @@ jobs:
         run: |
           echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
 
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon --stacktrace
+      - name: Pre-download dependencies
+        run: ./gradlew dependencies --parallel --configuration-cache
 
-      - name: Run unit tests
-        run: ./gradlew test --no-daemon --stacktrace
+      - name: Build, Test, Lint & Detekt
+        run: ./gradlew build test detekt lint --parallel --build-cache --configuration-cache --stacktrace
 
-      - name: Run Detekt
-        run: ./gradlew detekt --no-daemon --stacktrace
+      - name: Assemble Debug APKs
+        run: ./gradlew assembleDevDebug assembleProdDebug --parallel --build-cache --configuration-cache --stacktrace
 
-      - name: Upload build reports
-        if: failure()
+      - name: Assemble Release APKs
+        run: ./gradlew assembleDevRelease assembleProdRelease --parallel --build-cache --configuration-cache --stacktrace
+
+      - name: Upload Dev Debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: build-reports
-          path: |
-            **/build/reports/
-            **/build/test-results/
+          name: dev-debug-apk
+          path: app/build/outputs/apk/dev/debug/*.apk
           retention-days: 7
 
-  lint:
-    name: Lint Check
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Upload Prod Debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
+          name: prod-debug-apk
+          path: app/build/outputs/apk/prod/debug/*.apk
+          retention-days: 7
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Upload Dev Release APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-release-apk
+          path: app/build/outputs/apk/dev/release/*.apk
+          retention-days: 14
 
-      - name: Create google-services.json
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
-
-      - name: Run Android Lint
-        run: ./gradlew lint --no-daemon --stacktrace
+      - name: Upload Prod Release APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-release-apk
+          path: app/build/outputs/apk/prod/release/*.apk
+          retention-days: 14
 
       - name: Upload lint reports
         if: always()
@@ -91,46 +95,13 @@ jobs:
             **/build/reports/lint-results*.xml
           retention-days: 7
 
-  assemble-release:
-    name: Assemble Release Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Create google-services.json
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
-
-      - name: Assemble Dev Release APK
-        run: ./gradlew assembleDevRelease --no-daemon --stacktrace
-
-      - name: Assemble Prod Release APK
-        run: ./gradlew assembleProdRelease --no-daemon --stacktrace
-
-      - name: Upload Dev Release APK
+      - name: Upload build reports
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: dev-release-apk
-          path: app/build/outputs/apk/dev/release/*.apk
-          retention-days: 14
-
-      - name: Upload Prod Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: prod-release-apk
-          path: app/build/outputs/apk/prod/release/*.apk
-          retention-days: 14
+          name: build-reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
+          retention-days: 7
 
