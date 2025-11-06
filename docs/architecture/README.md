@@ -17,33 +17,33 @@ The authentication system consists of three interconnected ADRs:
 │                  Authentication System                       │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ ADR-005: Encrypted Token Storage                    │   │
-│  │ ├─ Google Tink (AES-256-GCM-HKDF)                   │   │
-│  │ ├─ DataStore Preferences                            │   │
-│  │ ├─ In-memory cache (AtomicReference)                │   │
-│  │ └─ Hardware-backed keys (Android Keystore)          │   │
-│  └─────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐     │
+│  │ ADR-005: Encrypted Token Storage                    │     │
+│  │ ├─ Google Tink (AES-256-GCM-HKDF)                   │     │
+│  │ ├─ DataStore Preferences                            │     │
+│  │ ├─ In-memory cache (AtomicReference)                │     │
+│  │ └─ Hardware-backed keys (Android Keystore)          │     │
+│  └─────────────────────────────────────────────────────┘     │
 │                          ▲                                   │
 │                          │ stores/retrieves                  │
 │                          │                                   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ ADR-003: Token Refresh Strategy                     │   │
-│  │ ├─ TokenAuthenticator (handles 401)                 │   │
-│  │ ├─ TokenRefreshCallback (DIP pattern)               │   │
-│  │ ├─ Automatic retry with new token                   │   │
-│  │ └─ No circular dependencies                         │   │
-│  └─────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐     │
+│  │ ADR-003: Token Refresh Strategy                     │     │
+│  │ ├─ TokenAuthenticator (handles 401)                 │     │
+│  │ ├─ TokenRefreshCallback (DIP pattern)               │     │
+│  │ ├─ Automatic retry with new token                   │     │
+│  │ └─ No circular dependencies                         │     │
+│  └─────────────────────────────────────────────────────┘     │
 │                          ▲                                   │
 │                          │ triggers when expired             │
 │                          │                                   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ ADR-006: Token Expiration Strategy                  │   │
-│  │ ├─ Proactive refresh (check before request)         │   │
-│  │ ├─ 5-minute buffer window                           │   │
-│  │ ├─ Saves 200-300ms latency                          │   │
-│  │ └─ AuthInterceptor (network layer)                  │   │
-│  └─────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐     │
+│  │ ADR-006: Token Expiration Strategy                  │     │
+│  │ ├─ Proactive refresh (check before request)         │     │
+│  │ ├─ 5-minute buffer window                           │     │
+│  │ ├─ Saves 200-300ms latency                          │     │
+│  │ └─ AuthInterceptor (network layer)                  │     │
+│  └─────────────────────────────────────────────────────┘     │
 │                                                              │
 └──────────────────────────────────────────────────────────────┘
 ```
