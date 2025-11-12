@@ -13,6 +13,9 @@ dependencies {
     // Profile API for navigation (routes only, no UI dependencies)
     implementation(project(":feature:profile:api"))
 
+    // Settings API for navigation (routes only, no UI dependencies)
+    implementation(project(":feature:settings:api"))
+
     // Permission handling
     implementation(libs.accompanist.permissions)
     // CameraX dependencies

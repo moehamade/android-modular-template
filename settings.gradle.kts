@@ -12,6 +12,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -38,3 +39,5 @@ include(":feature:profile:api")
 include(":core:analytics")
 include(":core:notifications")
 include(":core:remoteconfig")
+include(":feature:settings")
+include(":feature:settings:api")
