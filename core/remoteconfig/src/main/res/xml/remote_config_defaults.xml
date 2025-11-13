@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Firebase Remote Config default values.
+  These are fallback values when Firebase fetch fails or returns empty.
+  Runtime values can be overridden in Firebase Console.
+-->
+<defaultsMap>
+    <!-- Feature Flags -->
+    <entry>
+        <key>new_recording_ui_enabled</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>analytics_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>min_supported_version</key>
+        <value>1.0</value>
+    </entry>
+    <entry>
+        <key>api_timeout_seconds</key>
+        <value>30</value>
+    </entry>
+</defaultsMap>

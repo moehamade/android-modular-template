@@ -1,8 +1,8 @@
 package com.acksession.remoteconfig.di
 
 import com.acksession.remoteconfig.FeatureFlagManager
-import com.acksession.remoteconfig.FeatureFlags
 import com.acksession.remoteconfig.FirebaseFeatureFlagManager
+import com.acksession.remoteconfig.R
 import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
@@ -26,15 +26,7 @@ object RemoteConfigModule {
                 minimumFetchIntervalInSeconds = 3600
             }
             setConfigSettingsAsync(configSettings)
-
-            setDefaultsAsync(
-                mapOf(
-                    FeatureFlags.NEW_RECORDING_UI to false,
-                    FeatureFlags.ENABLE_ANALYTICS to true,
-                    FeatureFlags.MIN_APP_VERSION to "1.0",
-                    FeatureFlags.API_TIMEOUT_SECONDS to 30L
-                )
-            )
+            setDefaultsAsync(R.xml.remote_config_defaults)
         }
     }
 }
