@@ -18,14 +18,14 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            buildConfigField("String", "API_BASE_URL", "\"https://dev-api.zencastr.com/\"")
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://dev-api.zencastr.com/\"")
         }
 
         create("prod") {
             dimension = "environment"
-            buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com/\"")
             buildConfigField("String", "ENVIRONMENT", "\"production\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com/\"")
         }
     }
 
@@ -96,6 +96,8 @@ dependencies {
     implementation(project(":feature:recording"))
     implementation(project(":feature:recording:api"))
     implementation(project(":feature:profile"))
+    implementation(project(":feature:settings"))
+    implementation(project(":feature:settings:api"))
 
     // Firebase (using BOM for version management)
     implementation(platform(libs.firebase.bom))

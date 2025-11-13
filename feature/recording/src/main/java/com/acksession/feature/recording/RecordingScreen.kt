@@ -4,11 +4,13 @@ import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.acksession.feature.profile.api.navigateToProfile
+import com.acksession.feature.settings.api.navigateToSettings
 import com.acksession.navigation.Navigator
 import com.acksession.ui.utils.openAppSettings
 
@@ -78,23 +81,35 @@ fun RecordingScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            // Test navigation button - navigate to Profile with parameters
-            FloatingActionButton(
-                onClick = {
-                    navigator.navigateToProfile(
-                        userId = "USER_123",
-                        name = "Test User",
-                        role = "Video Creator"
-                    )
-                },
-                modifier = Modifier.padding(16.dp)
+            Column(
+                modifier = Modifier.padding(16.dp),
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Navigate to Profile"
-                )
+                FloatingActionButton(
+                    onClick = { navigator.navigateToSettings() },
+                    modifier = Modifier.padding(bottom = 16.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Navigate to Settings",
+                    )
+                }
+
+                FloatingActionButton(
+                    onClick = {
+                        navigator.navigateToProfile(
+                            userId = "USER_123",
+                            name = "Test User",
+                            role = "Video Creator",
+                        )
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Navigate to Profile",
+                    )
+                }
             }
-        }
+        },
     ) { paddingValues ->
         RecordingPermissionGate(
             content = {

@@ -1,7 +1,10 @@
 package com.acksession.zencastr.di
 
+import com.acksession.domain.config.BuildConfigProvider
 import com.acksession.network.qualifier.ApiBaseUrl
 import com.acksession.zencastr.BuildConfig
+import com.acksession.zencastr.config.AppBuildConfigProvider
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,4 +27,14 @@ object AppConfigModule {
     fun provideApiBaseUrl(): String {
         return BuildConfig.API_BASE_URL
     }
+}
+
+@Suppress("unused")
+@Module
+@InstallIn(SingletonComponent::class)
+interface AppConfigBindingModule {
+
+    @Binds
+    @Singleton
+    fun bindBuildConfigProvider(impl: AppBuildConfigProvider): BuildConfigProvider
 }

@@ -1,10 +1,10 @@
 package com.acksession.zencastr
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -40,10 +40,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ZencastrTheme {
-                Scaffold { paddingValues ->
+                @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+                Scaffold { _ ->
                     NavDisplay(
                         backStack = navigator.backStack,
-                        modifier = Modifier.consumeWindowInsets(paddingValues),
+                        modifier = Modifier,
                         onBack = {
                             // Handle back navigation
                             if (!navigator.navigateBack()) {
