@@ -23,28 +23,28 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Zencastr">
+        android:theme="@style/${appTheme}">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Zencastr">
+            android:theme="@style/${appTheme}">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep Links (zencastr://session/123) -->
+            <!-- Deep Links (${appScheme}://session/123) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:scheme="zencastr"
+                    android:scheme="${appScheme}"
                     android:host="session" />
             </intent-filter>
 
-            <!-- App Links (https://zencastr.com/session/123) -->
+            <!-- App Links (https://${appHost}/session/123) -->
             <!-- TODO: Set up assetlinks.json on your server for verification -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -52,7 +52,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="https"
-                    android:host="zencastr.com"
+                    android:host="${appHost}"
                     android:pathPrefix="/session" />
             </intent-filter>
         </activity>

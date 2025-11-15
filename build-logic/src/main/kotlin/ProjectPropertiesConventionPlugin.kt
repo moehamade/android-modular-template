@@ -21,12 +21,13 @@ abstract class ProjectProperties @Inject constructor(project: Project) {
     }
 
     val projectName = getRequiredProperty("project.name")
-    val projectNameLowercase = getRequiredProperty("project.name.lowercase")
+    val projectNameLowercase = projectName.lowercase()
     val appDisplayName = getRequiredProperty("app.display.name")
-    val corePackagePrefix = getRequiredProperty("package.base")
     val appPackageName = getRequiredProperty("package.app")
 
-    // This one is stable, but we can read it for consistency
+    // Auto-derive base package from app package (remove last segment)
+    // E.g., "com.example.myapp" -> "com.example"
+    val corePackagePrefix = appPackageName.substringBeforeLast('.')
     val pluginIdPrefix = getRequiredProperty("plugin.id.prefix")
 }
 

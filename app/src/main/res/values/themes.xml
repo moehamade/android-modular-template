@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base application theme for Compose -->
-    <style name="Theme.Zencastr" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Theme name is dynamically set via manifestPlaceholders in build.gradle.kts -->
+    <!-- Format: Theme.${projectProperties.projectName} (e.g., Theme.MyApp) -->
+    <style name="Theme.MyApp" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

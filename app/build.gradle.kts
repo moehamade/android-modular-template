@@ -11,7 +11,9 @@ plugins {
 val projectProperties: ProjectProperties by rootProject.extensions
 
 android {
-    namespace = "${projectProperties.appPackageName}"
+    namespace = projectProperties.appPackageName.also {
+        logger.lifecycle("Namespace: $it (from ${rootProject.file("template.properties")})")
+    }
 
     flavorDimensions += "environment"
 
@@ -21,13 +23,13 @@ android {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
-            buildConfigField("String", "API_BASE_URL", "\"https://dev-api.zencastr.com/\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://dev-api.example.com/\"") // TODO: Replace with your dev API URL
         }
 
         create("prod") {
             dimension = "environment"
             buildConfigField("String", "ENVIRONMENT", "\"production\"")
-            buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com/\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"") // TODO: Replace with your prod API URL
         }
     }
 
@@ -35,6 +37,12 @@ android {
         applicationId = projectProperties.appPackageName
         versionCode = rootProject.extra["versionCode"] as Int
         versionName = rootProject.extra["versionName"] as String
+
+        resValue("string", "app_name", projectProperties.appDisplayName)
+
+        manifestPlaceholders["appScheme"] = projectProperties.projectNameLowercase
+        manifestPlaceholders["appHost"] = "${projectProperties.projectNameLowercase}.com"
+        manifestPlaceholders["appTheme"] = "Theme.${projectProperties.projectName}"
     }
 
     // Signing configuration for release builds

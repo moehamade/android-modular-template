@@ -26,7 +26,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "zencastr_database"
+            "app_database"
         )
             .fallbackToDestructiveMigration(false) // TODO: Add proper migrations in production
             .build()

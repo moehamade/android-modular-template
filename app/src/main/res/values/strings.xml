@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Zencastr</string>
+    <!-- app_name is auto-generated from template.properties -->
+    <!-- See app/build.gradle.kts: resValue("string", "app_name", ...) -->
 </resources>

@@ -20,8 +20,15 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+val templateProperties = java.util.Properties().apply {
+    val propertiesFile = file("template.properties")
+    if (propertiesFile.exists()) {
+        propertiesFile.inputStream().use { load(it) }
+    }
+}
 
-rootProject.name = "Zencastr"
+rootProject.name = templateProperties.getProperty("project.name") ?: "android-modular-template"
+
 include(":app")
 include(":core:ui")
 include(":core:common")
