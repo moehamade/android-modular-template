@@ -1,5 +1,5 @@
 plugins {
-    id("zencastr.android.feature")
+    alias(libs.plugins.convention.android.feature)
 }
 
 android {

@@ -7,4 +7,5 @@ object AndroidConfig {
     val JAVA_VERSION = JavaVersion.VERSION_11
     const val JVM_TARGET = "11"
     const val NAMESPACE_PREFIX = "com.acksession"
+    const val PLUGIN_ID_PREFIX = "convention"
 }

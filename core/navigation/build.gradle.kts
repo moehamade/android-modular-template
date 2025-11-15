@@ -1,6 +1,6 @@
 plugins {
-    id("zencastr.android.library")
-    id("zencastr.android.hilt")
+    alias(libs.plugins.convention.android.library)
+    alias(libs.plugins.convention.android.hilt)
     alias(libs.plugins.kotlin.serialization)
 }
 

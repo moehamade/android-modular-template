@@ -4,6 +4,8 @@ plugins {
 
 group = "com.acksession.zencastr.buildlogic"
 
+val pluginIdPrefix = "convention"
+
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
@@ -15,35 +17,35 @@ dependencies {
 gradlePlugin {
     plugins {
         register("androidApplication") {
-            id = "zencastr.android.application"
+            id = "$pluginIdPrefix.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
         register("androidLibrary") {
-            id = "zencastr.android.library"
+            id = "$pluginIdPrefix.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
         }
         register("androidCompose") {
-            id = "zencastr.android.compose"
+            id = "$pluginIdPrefix.android.compose"
             implementationClass = "AndroidComposeConventionPlugin"
         }
         register("androidHilt") {
-            id = "zencastr.android.hilt"
+            id = "$pluginIdPrefix.android.hilt"
             implementationClass = "AndroidHiltConventionPlugin"
         }
         register("androidRoom") {
-            id = "zencastr.android.room"
+            id = "$pluginIdPrefix.android.room"
             implementationClass = "AndroidRoomConventionPlugin"
         }
         register("androidFeature") {
-            id = "zencastr.android.feature"
+            id = "$pluginIdPrefix.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
         register("androidNetwork") {
-            id = "zencastr.android.network"
+            id = "$pluginIdPrefix.android.network"
             implementationClass = "AndroidNetworkConventionPlugin"
         }
         register("featureScaffolding") {
-            id = "zencastr.scaffolding.feature"
+            id = "$pluginIdPrefix.scaffolding.feature"
             implementationClass = "FeatureScaffoldingConventionPlugin"
         }
     }

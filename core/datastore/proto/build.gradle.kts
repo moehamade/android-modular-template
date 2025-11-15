@@ -1,6 +1,6 @@
 plugins {
-    id("zencastr.android.library")
-    id("zencastr.android.hilt")
+    alias(libs.plugins.convention.android.library)
+    alias(libs.plugins.convention.android.hilt)
     // TODO: Add protobuf plugin when implementing Proto DataStore
 //     id("com.google.protobuf") version "0.9.4"
 }

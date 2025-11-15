@@ -1,7 +1,7 @@
 plugins {
-    id("zencastr.android.application")
-    id("zencastr.android.compose")
-    id("zencastr.android.hilt")
+    alias(libs.plugins.convention.android.application)
+    alias(libs.plugins.convention.android.compose)
+    alias(libs.plugins.convention.android.hilt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)

@@ -178,6 +178,7 @@ firebase-crashlytics-gradlePlugin = { module = "com.google.firebase:firebase-cra
 firebase-perf-gradlePlugin = { module = "com.google.firebase:perf-plugin", version = "1.4.2" }
 
 [plugins]
+# External plugins
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -191,6 +192,16 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }
 firebase-perf = { id = "com.google.firebase.firebase-perf", version = "1.4.2" }
+
+# Convention plugins
+convention-android-application = { id = "convention.android.application" }
+convention-android-library = { id = "convention.android.library" }
+convention-android-compose = { id = "convention.android.compose" }
+convention-android-hilt = { id = "convention.android.hilt" }
+convention-android-room = { id = "convention.android.room" }
+convention-android-feature = { id = "convention.android.feature" }
+convention-android-network = { id = "convention.android.network" }
+convention-scaffolding-feature = { id = "convention.scaffolding.feature" }
 
 [bundles]
 compose = [

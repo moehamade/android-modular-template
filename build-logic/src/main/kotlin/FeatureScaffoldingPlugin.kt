@@ -34,7 +34,7 @@ abstract class CreateFeatureTask : DefaultTask() {
         }
 
         val camelCaseName = name.replaceFirstChar { it.titlecase(Locale.ROOT) }
-        val namespacePrefix = "com.acksession" // As defined in your project structure
+        val namespacePrefix = AndroidConfig.NAMESPACE_PREFIX
         val rootDir = project.rootDir
 
         val featureModulePath = "feature/$name"
@@ -84,7 +84,7 @@ abstract class CreateFeatureTask : DefaultTask() {
     private fun createFeatureBuildGradle(moduleDir: File, name: String, namespacePrefix: String) {
         File(moduleDir, "build.gradle.kts").writeText("""
             plugins {
-                id("zencastr.android.feature")
+                alias(libs.plugins.${AndroidConfig.PLUGIN_ID_PREFIX}.android.feature)
             }
 
             android {
@@ -103,7 +103,7 @@ abstract class CreateFeatureTask : DefaultTask() {
     private fun createApiBuildGradle(moduleDir: File, name: String, namespacePrefix: String) {
         File(moduleDir, "build.gradle.kts").writeText("""
             plugins {
-                id("zencastr.android.library")
+                alias(libs.plugins.${AndroidConfig.PLUGIN_ID_PREFIX}.android.library)
                 alias(libs.plugins.kotlin.serialization)
             }
 

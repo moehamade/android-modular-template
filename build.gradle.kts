@@ -26,8 +26,7 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.room) apply false
     alias(libs.plugins.detekt) // Applied to root to create aggregated detekt task for CI/CD
-
-    id("zencastr.scaffolding.feature")
+    alias(libs.plugins.convention.scaffolding.feature)
 }
 
 // Configure Detekt for root project (aggregates all subproject results)

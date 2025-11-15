@@ -1,5 +1,5 @@
 plugins {
-    id("zencastr.android.library")
+    alias(libs.plugins.convention.android.library)
     alias(libs.plugins.kotlin.serialization)
 }
 

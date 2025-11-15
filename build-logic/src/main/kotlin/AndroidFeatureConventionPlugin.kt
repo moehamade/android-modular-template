@@ -16,9 +16,9 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("zencastr.android.library")
-                apply("zencastr.android.compose")
-                apply("zencastr.android.hilt")
+                apply("${AndroidConfig.PLUGIN_ID_PREFIX}.android.library")
+                apply("${AndroidConfig.PLUGIN_ID_PREFIX}.android.compose")
+                apply("${AndroidConfig.PLUGIN_ID_PREFIX}.android.hilt")
             }
 
             extensions.configure<LibraryExtension> {
