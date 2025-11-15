@@ -1,15 +1,58 @@
-# Zencastr
+# Android Modular Template
 
-A modern Android podcast recording application built with Jetpack Compose and Clean Architecture.
+A production-ready Android application template built with Jetpack Compose, Clean Architecture, and modern best practices. This template provides a solid foundation for building scalable Android applications with enterprise-grade architecture.
 
-## Features
+> **Note:** This is a template project. The recording and profile features are demo implementations showcasing architectural patterns and best practices. Use them as reference or replace with your own features.
 
-- 🎙️ High-quality audio recording
-- 👥 Multi-participant session management
-- 🎨 Material3 design with dark/light themes
-- 📱 Modern Compose UI
-- 🔐 Secure JWT authentication
-- ☁️ Cloud sync capabilities
+## Why Use This Template?
+
+- **One-Command Rebranding** - Rename the entire project in seconds
+- **Production-Ready** - Firebase, security, CI/CD, monitoring all configured
+- **Modern Stack** - Compose, Navigation3, Hilt, Room, Retrofit
+- **Clean Architecture** - Multi-module structure with clear separation of concerns
+- **Developer Experience** - Convention plugins, scaffolding, git hooks, comprehensive docs
+- **Type-Safe Navigation** - Navigation3 with sealed routes and API modules
+- **Security Built-In** - Encrypted token storage using Google Tink, ProGuard rules
+- **Firebase Integration** - Analytics, Crashlytics, FCM, Remote Config ready to go
+- **CI/CD Ready** - GitHub Actions workflows for testing, building, and deployment
+
+## Template Features
+
+### Core Infrastructure
+- 🎨 **UI Layer**: Jetpack Compose with Material3, shared design system
+- 🏗️ **Architecture**: Multi-module Clean Architecture with dependency rules
+- 💉 **Dependency Injection**: Hilt with convention plugin setup
+- 🧭 **Navigation**: Navigation3 with type-safe routing and feature isolation
+- 🌐 **Networking**: Retrofit + OkHttp with JWT authentication and token refresh
+- 💾 **Local Storage**: Room database + encrypted DataStore (Google Tink)
+- 🔧 **Build System**: Gradle with Kotlin DSL + reusable convention plugins
+
+### Production Features
+- 📊 **Firebase Analytics** - Event tracking, screen views, user properties
+- 💥 **Crashlytics** - Crash reporting with custom logging
+- 🔔 **Push Notifications** - FCM integration with topic subscriptions
+- 🎛️ **Remote Config** - Feature flags and A/B testing
+- 🔐 **Security** - AES-256-GCM encryption for tokens, ProGuard/R8 obfuscation
+- 🚀 **CI/CD** - GitHub Actions for testing, linting, building, deploying
+- 🧪 **Testing** - Unit test infrastructure with mocking setup
+- 📱 **Build Variants** - Dev/Prod flavors with different configurations
+
+### Developer Tools
+- 🛠️ **Feature Scaffolding** - Auto-generate new feature modules with one command
+- 🎣 **Git Hooks** - Pre-commit checks for code quality (Detekt + tests)
+- 📦 **Version Management** - Centralized version bump script
+- 🐛 **Debug Tools** - LeakCanary (memory leaks) + Chucker (network inspector)
+- 📚 **Documentation** - ADRs, API docs, setup guides, module READMEs
+
+## Demo Features (Reference Implementations)
+
+The template includes example features demonstrating best practices:
+
+- **Recording Feature** (`feature:recording`) - Demonstrates camera/permissions, multi-feature navigation
+- **Profile Feature** (`feature:profile`) - Shows basic CRUD operations and state management
+- **Settings Feature** (`feature:settings`) - Example of preference management and build info display
+
+**These are meant as learning examples** - feel free to keep, modify, or remove them for your project.
 
 ## Tech Stack
 
@@ -17,108 +60,121 @@ A modern Android podcast recording application built with Jetpack Compose and Cl
 - **Architecture**: Multi-module Clean Architecture
 - **Dependency Injection**: Hilt
 - **Navigation**: Navigation3 with type-safe routing
-- **Networking**: Retrofit + OkHttp
-- **Local Storage**: DataStore
+- **Networking**: Retrofit + OkHttp + Kotlinx Serialization
+- **Local Storage**: Room + DataStore (encrypted with Google Tink)
+- **Async**: Kotlin Coroutines + Flow
 - **Build System**: Gradle with Kotlin DSL + Convention Plugins
+- **Security**: Google Tink (AES-256-GCM), ProGuard/R8
+- **Firebase**: Analytics, Crashlytics, FCM, Remote Config, Performance
+- **Testing**: JUnit, MockK, Turbine (Flow testing)
+- **Code Quality**: Detekt, Android Lint, Git Hooks
 
 ## Project Structure
 
-The project uses a modular architecture for scalability and maintainability:
-
 ```
-zencastr/
-├── app/                    # Main application module
+android-modular-template/
+├── app/                          # Main application module
 ├── core/
-│   ├── ui/                # Shared UI components and theme
-│   ├── navigation/        # Type-safe navigation setup
-│   ├── network/          # Network configuration
-│   ├── data/             # Data layer and repositories
-│   ├── domain/           # Business logic (pure Kotlin)
-│   └── datastore/        # Local data persistence
+│   ├── ui/                      # Shared UI components, theme, design system
+│   ├── common/                  # Infrastructure (dispatchers, scopes, DI qualifiers)
+│   ├── navigation/              # Navigation3 setup, Navigator wrapper
+│   ├── network/                 # Retrofit, OkHttp, auth interceptors
+│   ├── data/                    # Repositories, data sources, Room database
+│   ├── domain/                  # Business logic, use cases, domain models
+│   ├── datastore/
+│   │   ├── preferences/        # Encrypted token storage (Tink + DataStore)
+│   │   └── proto/              # Proto DataStore (placeholder)
+│   ├── analytics/              # Firebase Analytics + Crashlytics
+│   ├── notifications/          # Firebase Cloud Messaging (FCM)
+│   └── remoteconfig/           # Firebase Remote Config, feature flags
 ├── feature/
-│   ├── recording/        # Recording functionality
-│   └── profile/          # User profile management
-└── build-logic/          # Gradle convention plugins
+│   ├── recording/              # Demo: Recording feature (camera, permissions)
+│   ├── profile/                # Demo: User profile management
+│   └── settings/               # Demo: App settings screen
+└── build-logic/                # Gradle convention plugins
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-- Android Studio Jellyfish (2023.3.1) or newer
+- Android Studio Ladybug (2024.2.1) or newer
 - JDK 11 or higher
 - Android SDK (API 30+)
+- Git
 
-### Using as a Template
+### Quick Start: Rebrand for Your Project
 
-This project is designed to be used as a template for new Android projects. To rebrand it for your own project:
+**Step 1: Clone the template**
+```bash
+git clone https://github.com/yourusername/android-modular-template.git MyApp
+cd MyApp
+```
 
-#### Quick Rebrand
+**Step 2: Rebrand in one command**
 
-Use the included rebrand script to automatically rename the entire project:
+The template includes a powerful rebrand script that automatically renames everything:
 
 ```bash
-# Interactive mode (recommended for first-time users)
+# Interactive mode (recommended)
 ./rebrand.sh
 
-# Command-line mode
+# Or specify values directly
 ./rebrand.sh --project-name MyApp \
-             --package-name com.example.myapp \
-             --app-name "My App"
+             --package-name com.mycompany.myapp \
+             --app-name "My Awesome App"
 
-# Preview changes without applying (dry run)
+# Preview changes first (dry run)
 ./rebrand.sh --project-name MyApp \
-             --package-name com.example.myapp \
-             --app-name "My App" \
+             --package-name com.mycompany.myapp \
              --dry-run
 
-# Rebrand and reset git history (fresh start)
+# Start with fresh git history
 ./rebrand.sh --project-name MyApp \
-             --package-name com.example.myapp \
-             --app-name "My App" \
+             --package-name com.mycompany.myapp \
              --reset-git
 ```
 
-The script will:
-- Replace all package names (`com.acksession` → `com.yourcompany.yourapp`)
-- Rename the project (`Zencastr` → `YourProjectName`)
-- Update app display name in resources
-- Rename package directory structure
-- Update all documentation references
-- Validate the build to ensure everything compiles
-- Optionally reset git history for a fresh start
+**The script automatically:**
+- ✅ Replaces package names (`com.example` → `com.mycompany.myapp`)
+- ✅ Renames project (`MyApp`, `myapp`, etc.)
+- ✅ Updates app display name
+- ✅ Renames directory structure
+- ✅ Updates all documentation
+- ✅ Handles Firebase configurations
+- ✅ Optionally resets git history
 
-**After rebranding:**
-1. Review changes with `git diff`
-2. Test the app thoroughly
-3. Update any custom configurations (API keys, signing, etc.)
-4. Commit: `git add . && git commit -m "Rebrand to MyApp"`
+**Step 3: Firebase Setup** (Required)
 
-#### Manual Setup (if not using rebrand script)
-
-1. Clone the repository:
+Create Firebase project and download `google-services.json`:
 ```bash
-git clone https://github.com/yourusername/zencastr.git
-cd zencastr
+# See detailed instructions:
+cat app/README_FIREBASE_SETUP.md
 ```
 
-2. Open the project in Android Studio
-
-3. Let Gradle sync complete
-
-4. Build the project:
+**Step 4: Build and run**
 ```bash
-./gradlew build
+./gradlew :app:assembleDevDebug
 ```
 
-5. Run the app on an emulator or device
+### Manual Setup (Alternative)
 
-### Configuration
+If you prefer manual setup:
 
-Create a `local.properties` file in the root directory and add:
-```properties
-sdk.dir=/path/to/your/android/sdk
-```
+1. **Clone and open in Android Studio**
+   ```bash
+   git clone https://github.com/yourusername/android-modular-template.git
+   cd android-modular-template
+   ```
+
+2. **Configure Firebase** (required for build)
+   - See `app/README_FIREBASE_SETUP.md`
+   - Download `google-services.json` to `app/` directory
+
+3. **Sync and build**
+   ```bash
+   ./gradlew build
+   ```
 
 ## Building
 
@@ -126,133 +182,210 @@ sdk.dir=/path/to/your/android/sdk
 # Build all modules
 ./gradlew build
 
-# Build debug APK
-./gradlew assembleDebug
-
-# Build release APK
-./gradlew assembleRelease
+# Build specific variant
+./gradlew :app:assembleDevDebug      # Dev environment, debug build
+./gradlew :app:assembleProdRelease   # Production release build
 
 # Run tests
-./gradlew test
+./gradlew test                       # All unit tests
+./gradlew connectedAndroidTest       # Instrumented tests (requires device)
+
+# Code quality
+./gradlew detekt                     # Static analysis
+./gradlew lint                       # Android lint
 
 # Clean build
 ./gradlew clean build
 ```
 
+## Development Workflow
+
+### Create a New Feature Module
+
+Use the built-in scaffolding task:
+
+```bash
+./gradlew createFeature -PfeatureName=dashboard
+```
+
+This automatically creates:
+- `:feature:dashboard` - Feature implementation module
+- `:feature:dashboard:api` - Navigation routes (for cross-feature navigation)
+- Proper build configuration, manifests, and boilerplate
+- Updates `settings.gradle.kts`
+
+### Version Management
+
+```bash
+./scripts/bump_version.sh patch  # 1.0.0 → 1.0.1 (bug fixes)
+./scripts/bump_version.sh minor  # 1.0.0 → 1.1.0 (new features)
+./scripts/bump_version.sh major  # 1.0.0 → 2.0.0 (breaking changes)
+```
+
+### Install Git Hooks
+
+```bash
+./install-hooks.sh
+```
+
+Pre-commit hooks run:
+- Detekt static analysis
+- Unit tests
+
 ## Architecture Highlights
 
 ### Multi-Module Design
 
-Each module has a specific responsibility:
-
-- **Core modules** provide shared functionality (UI, networking, data)
+- **Core modules** provide shared functionality (UI, networking, data, infrastructure)
 - **Feature modules** are isolated and independently developable
 - **Convention plugins** eliminate build configuration boilerplate
+- Clear dependency rules prevent architectural violations
 
 ### Type-Safe Navigation
 
-Features expose navigation routes through `:api` modules:
+Features expose navigation through `:api` modules using Navigation3:
 
 ```kotlin
+// In feature:profile:api module
 @Serializable
-sealed interface RecordingRoute : NavKey {
+sealed interface ProfileRoute : NavKey {
     @Serializable
-    data class Record(val sessionId: String) : RecordingRoute
+    data class Profile(val userId: String) : ProfileRoute
+}
+
+fun Navigator.navigateToProfile(userId: String) {
+    navigateTo(ProfileRoute.Profile(userId))
 }
 ```
 
-This enables cross-feature navigation without tight coupling.
+Other features depend on `:api` modules for navigation without tight coupling.
 
 ### Clean Network Layer
 
-The network module handles authentication transparently:
-
-- JWT tokens stored securely in DataStore
+- JWT tokens stored securely with **Google Tink** (AES-256-GCM encryption)
 - Automatic token refresh on 401 responses
-- No circular dependencies using Dependency Inversion
+- No circular dependencies (uses Dependency Inversion Principle)
+- Encrypted in-memory cache for performance
 
-## Contributing
+### Convention Plugins System
 
-We welcome contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
+Build configuration is centralized in `build-logic/` using reusable convention plugins:
 
-- Commit message conventions
-- Code style guidelines
-- Pull request process
-- How to create new modules
+- `convention.android.application` - For app module
+- `convention.android.library` - For library modules
+- `convention.android.feature` - For feature modules (includes Compose + Hilt)
+- `convention.android.compose` - Adds Compose support
+- `convention.android.hilt` - Adds Hilt DI
+- `convention.android.room` - Adds Room database
+- `convention.android.network` - Adds networking dependencies
 
-Quick commit format:
-```
-<type>(<scope>): <description>
+SDK versions and build config are centralized in `AndroidConfig.kt` and `template.properties`.
 
-Example: feat(recording): add pause/resume functionality
-```
+## CI/CD
 
-## Development Workflow
+GitHub Actions workflows included:
 
-### Creating a New Feature
+- **CI** (`.github/workflows/ci.yml`) - Runs on every push/PR
+  - Build all modules
+  - Run unit tests
+  - Run Detekt + Lint
+  - Assemble debug and release APKs
 
-Use the scaffolding task:
-```bash
-./gradlew createFeature -PfeatureName=myfeature
-```
+- **Build Release APKs** (`.github/workflows/build-release.yml`) - Manual or on tags
+  - Build unsigned release APKs
+  - Upload artifacts
+  - Create GitHub releases
 
-This automatically creates the module structure with proper configuration.
+See `MANUAL_SETUP_REQUIRED.md` for Play Store deployment setup.
 
-### Running Tests
+## Documentation
 
-```bash
-# Unit tests
-./gradlew test
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines, coding standards
+- **[CLAUDE.md](CLAUDE.md)** - AI assistant development guide (comprehensive architecture docs)
+- **[docs/architecture/](docs/architecture/)** - Architecture Decision Records (ADRs)
+- **[docs/api/](docs/api/)** - API documentation
+- **[MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md)** - Production setup checklist
+- **[NEXT_STEPS.md](NEXT_STEPS.md)** - Quick reference for next steps
 
-# Specific module
-./gradlew :feature:recording:test
+## Customization Guide
 
-# UI tests (requires device)
-./gradlew connectedAndroidTest
-```
+After rebranding:
 
-### Troubleshooting
+1. **Remove demo features** (optional):
+   - Delete `feature:recording`, `feature:profile`, `feature:settings` if not needed
+   - Update `settings.gradle.kts` and app dependencies
 
-If you encounter build issues:
+2. **Configure Firebase**:
+   - Update package names in Firebase Console
+   - Download new `google-services.json`
+   - Configure Analytics events, FCM topics, Remote Config keys
+
+3. **Update API endpoints**:
+   - Change URLs in `app/build.gradle.kts` (dev/prod flavors)
+   - Implement real API services in `:core:data`
+
+4. **Customize theme**:
+   - Update colors, typography in `:core:ui`
+   - Replace app icon and splash screen
+
+5. **Add your features**:
+   - Use `./gradlew createFeature -PfeatureName=yourfeature`
+   - Follow existing patterns for consistency
+
+## Troubleshooting
+
+**Build fails with "google-services.json not found"**:
+- See `app/README_FIREBASE_SETUP.md` for setup instructions
+- For CI/CD, add `GOOGLE_SERVICES_JSON` GitHub secret
+
+**Import/sync issues**:
 ```bash
 ./gradlew --stop
 ./gradlew clean build
 ```
 
+**Git hooks not running**:
+```bash
+./install-hooks.sh
+```
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) for more troubleshooting tips.
 
-## Template Features
+## Contributing
 
-This project is designed to serve as a production-ready template for Android apps:
-
-- **Automatic Rebranding** - One-command script to rename entire project
-- **Convention Plugins** - Centralized build configuration for consistency
-- **Multi-Module Architecture** - Scalable, maintainable code structure
-- **Type-Safe Navigation** - Navigation3 with sealed routes and API modules
-- **Clean Network Layer** - JWT auth with automatic token refresh
-- **Security Built-In** - Encrypted token storage, ProGuard configuration
-- **CI/CD Ready** - GitHub Actions workflow included
-- **Code Quality** - Detekt, git hooks, and testing infrastructure
-- **Comprehensive Docs** - ADRs, API docs, and setup guides
-
-## Documentation
-
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-- [CLAUDE.md](CLAUDE.md) - AI assistant development guide
-- [docs/architecture/](docs/architecture/) - Architecture Decision Records (ADRs)
-- [docs/api/](docs/api/) - API documentation
-- [docs/PRODUCTION_SETUP.md](docs/PRODUCTION_SETUP.md) - Production deployment guide
-- Module READMEs - Documentation for each module
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Commit message conventions
+- Code style guidelines
+- Pull request process
+- Module creation guidelines
 
 ## License
 
-[Your License Here]
+MIT License
 
-## Contact
+Copyright (c) 2025 Moe Hamade
 
-[Your Contact Information]
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Authors & Maintainers
+
+**Original Author:** [Moe Hamade](https://github.com/moehamade)
+
+**Maintained by:** [Acksession](https://acksession.com)
+
+This template was developed as a production-ready foundation for Android applications and is actively maintained by Acksession's engineering team.
+
+## Acknowledgments
+
+Built with inspiration from:
+- [Now in Android](https://github.com/android/nowinandroid) by Google
+- Android Architecture Blueprints
+- Modern Android Development best practices
 
 ---
 
-Made with ❤️ using Jetpack Compose
-
+**Questions?** Open an issue or check the [documentation](docs/).

@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Zencastr is an Android application built with Jetpack Compose using a multi-module architecture following Clean Architecture principles. The project uses Gradle convention plugins to minimize boilerplate and maintain consistency across modules.
+**Android Modular Template** is a production-ready template project for building Android applications with Jetpack Compose and Clean Architecture. The project demonstrates modern best practices through multi-module architecture, type-safe navigation, secure authentication, and comprehensive Firebase integration.
+
+**Note**: The recording, profile, and settings features are demo implementations showcasing architectural patterns. They serve as reference examples and can be replaced with your own features.
 
 ## Initial Setup Requirements
 
@@ -14,9 +16,10 @@ Zencastr is an Android application built with Jetpack Compose using a multi-modu
 
 1. **Firebase Configuration** (Required for any build):
    - Create Firebase project at [Firebase Console](https://console.firebase.google.com)
-   - Add Android app with package: `com.acksession.zencastr`
+   - Add Android app with package: `com.example.myapp` (or your chosen package name)
    - Download `google-services.json` and place in `app/` directory
    - See `app/README_FIREBASE_SETUP.md` for detailed instructions
+   - **Note**: Update package name after rebranding the project
 
 2. **Verify Setup**:
    ```bash
@@ -135,9 +138,10 @@ The project follows a modular architecture with clear separation of concerns:
 :core:analytics             - Firebase Crashlytics, Analytics, Performance monitoring
 :core:notifications         - Push notifications (FCM), notification channels
 :core:remoteconfig          - Firebase Remote Config, feature flags, A/B testing
-:feature:recording          - Recording feature (screen + logic)
-:feature:profile            - Profile feature implementation
+:feature:recording          - Demo: Recording feature (camera, permissions example)
+:feature:profile            - Demo: Profile feature (CRUD operations example)
 :feature:profile:api        - Profile routes for cross-feature navigation (no UI)
+:feature:settings           - Demo: Settings feature (preferences example)
 ```
 
 **Dependency Flow:**
@@ -238,9 +242,9 @@ interface AnalyticsTracker {
 - FCM token management and topic subscriptions
 - Android 13+ notification permission handling
 
-**Interface-based design** (`ZencastrNotificationManager`):
+**Interface-based design** (example `NotificationManager` interface):
 ```kotlin
-interface ZencastrNotificationManager {
+interface NotificationManager {
     fun createNotificationChannels()
     fun showNotification(channelId: String, notificationId: Int, title: String, message: String, autoCancel: Boolean = true)
     suspend fun getFcmToken(): String?
@@ -279,13 +283,13 @@ productFlavors {
         dimension = "environment"
         applicationIdSuffix = ".dev"
         versionNameSuffix = "-dev"
-        buildConfigField("String", "API_BASE_URL", "\"https://dev-api.zencastr.com/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://dev-api.example.com/\"")
         buildConfigField("String", "ENVIRONMENT", "\"development\"")
     }
 
     create("prod") {
         dimension = "environment"
-        buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
         buildConfigField("String", "ENVIRONMENT", "\"production\"")
     }
 }
@@ -358,15 +362,15 @@ The `:app` module provides `@Named("isDebug")` Boolean to `:core:network` for co
 
 **Custom URL Schemes**:
 ```xml
-<data android:scheme="zencastr" android:host="session" />
+<data android:scheme="myapp" android:host="content" />
 ```
-Example: `zencastr://session/123`
+Example: `myapp://content/123`
 
 **App Links** (verified HTTPS):
 ```xml
-<data android:scheme="https" android:host="zencastr.com" android:pathPrefix="/session" />
+<data android:scheme="https" android:host="example.com" android:pathPrefix="/content" />
 ```
-Example: `https://zencastr.com/session/123`
+Example: `https://example.com/content/123`
 
 #### Firebase Setup
 
@@ -374,9 +378,10 @@ Example: `https://zencastr.com/session/123`
 
 See `app/README_FIREBASE_SETUP.md` for detailed setup instructions:
 1. Create Firebase project
-2. Add Android app with package `com.acksession.zencastr`
+2. Add Android app with your package name (e.g., `com.example.myapp`)
 3. Download `google-services.json`
 4. Enable Firebase services (Crashlytics, Analytics, FCM, Remote Config)
+5. Update package name after rebranding
 
 **Build without Firebase will fail** - `google-services.json` is required.
 
@@ -409,25 +414,34 @@ See `app/README_FIREBASE_SETUP.md` for detailed setup instructions:
 **Critical:** This project uses Gradle convention plugins located in `build-logic/` to eliminate boilerplate. All modules use these plugins instead of directly configuring Android/Kotlin settings.
 
 **Available Plugins:**
-- `zencastr.android.application` - For `:app` module (includes SDK config, test dependencies, Kotlin setup)
-- `zencastr.android.library` - For library modules (same as above, but for libraries)
-- `zencastr.android.feature` - For feature modules (applies library + compose + hilt + core dependencies automatically)
-- `zencastr.android.compose` - Adds Jetpack Compose support (must be applied after application/library plugin)
-- `zencastr.android.hilt` - Adds Hilt dependency injection (KSP + dependencies)
-- `zencastr.android.room` - Adds Room database support (KSP + dependencies)
-- `zencastr.android.network` - Adds networking dependencies (Retrofit, OkHttp, Kotlinx Serialization)
+- `convention.android.application` - For `:app` module (includes SDK config, test dependencies, Kotlin setup)
+- `convention.android.library` - For library modules (same as above, but for libraries)
+- `convention.android.feature` - For feature modules (applies library + compose + hilt + core dependencies automatically)
+- `convention.android.compose` - Adds Jetpack Compose support (must be applied after application/library plugin)
+- `convention.android.hilt` - Adds Hilt dependency injection (KSP + dependencies)
+- `convention.android.room` - Adds Room database support (KSP + dependencies)
+- `convention.android.network` - Adds networking dependencies (Retrofit, OkHttp, Kotlinx Serialization)
 
 **Note**: Detekt is applied globally to all subprojects in the root `build.gradle.kts` - no need to apply it per-module.
 
 **Configuration Centralization:**
-All Android build constants are in `build-logic/src/main/kotlin/AndroidConfig.kt`:
+
+**Build Configuration** (`build-logic/src/main/kotlin/AndroidConfig.kt`):
 - `COMPILE_SDK = 36`
 - `MIN_SDK = 30`
 - `TARGET_SDK = 36`
 - `JVM_TARGET = "11"`
-- `NAMESPACE_PREFIX = "com.acksession"`
 
-**To change SDK versions or build settings:** Edit `AndroidConfig.kt` - changes apply to all modules automatically.
+**Branding Configuration** (`template.properties`):
+- Package names (`package.base`, `package.app`)
+- Project names (`project.name`, `project.name.lowercase`)
+- App display name (`app.display.name`)
+- Plugin ID prefix (`plugin.id.prefix`)
+
+All modules access these via the `ProjectPropertiesConventionPlugin`, which reads from `template.properties`.
+
+**To change SDK versions:** Edit `AndroidConfig.kt` - changes apply to all modules automatically.
+**To rebrand the project:** Run `./rebrand.sh` or edit `template.properties` and rebuild.
 
 ## Coroutines and Dispatchers
 
@@ -440,17 +454,17 @@ The project uses a centralized infrastructure module (`:core:common`) for corout
 @IoDispatcher, @DefaultDispatcher, @MainDispatcher
 
 // Use type-safe enum-based approach:
-@Dispatcher(ZencastrDispatchers.IO)
-@Dispatcher(ZencastrDispatchers.Default)
-@Dispatcher(ZencastrDispatchers.Main)
-@Dispatcher(ZencastrDispatchers.Unconfined)
+@Dispatcher(AppDispatchers.IO)
+@Dispatcher(AppDispatchers.Default)
+@Dispatcher(AppDispatchers.Main)
+@Dispatcher(AppDispatchers.Unconfined)
 ```
 
 **Example usage in use cases:**
 ```kotlin
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository,
-    @Dispatcher(ZencastrDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
+    @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(email: String, password: String) =
         withContext(ioDispatcher) {
@@ -486,7 +500,7 @@ class TinkAuthStorage @Inject constructor(
 
 **Benefits:**
 - Compile-time safety (typo in dispatcher enum = compile error)
-- Self-documenting (`ZencastrDispatchers.IO` is clearer than `@IoDispatcher`)
+- Self-documenting (`AppDispatchers.IO` is clearer than `@IoDispatcher`)
 - Centralized in `:core:common` - no layering violations
 - Follows Now in Android best practices
 
