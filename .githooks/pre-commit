@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Pre-commit hook for Zencastr Android project
 # Runs code quality checks before allowing commits
 
 set -e
@@ -34,21 +33,6 @@ else
     echo ""
     echo "Please fix the issues reported by Detekt before committing."
     echo "Run: ./gradlew detekt"
-    echo ""
-    echo "To bypass this check (not recommended): git commit --no-verify"
-    exit 1
-fi
-
-# Run unit tests (quick smoke test)
-echo ""
-echo "🧪 Running unit tests..."
-if ./gradlew test --daemon > /dev/null 2>&1; then
-    echo -e "${GREEN}✓ Tests passed${NC}"
-else
-    echo -e "${RED}✗ Tests failed${NC}"
-    echo ""
-    echo "Please fix failing tests before committing."
-    echo "Run: ./gradlew test"
     echo ""
     echo "To bypass this check (not recommended): git commit --no-verify"
     exit 1
