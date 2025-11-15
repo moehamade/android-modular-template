@@ -3,8 +3,10 @@ plugins {
     alias(libs.plugins.convention.android.hilt)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.notifications"
+    namespace = "${projectProperties.corePackagePrefix}.notifications"
 }
 
 dependencies {

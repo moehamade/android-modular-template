@@ -15,10 +15,13 @@ import org.gradle.kotlin.dsl.dependencies
 class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
+            val projectProperties = rootProject.extensions.getByType(ProjectProperties::class.java)
+            val pluginIdPrefix = projectProperties.pluginIdPrefix
+
             with(pluginManager) {
-                apply("${AndroidConfig.PLUGIN_ID_PREFIX}.android.library")
-                apply("${AndroidConfig.PLUGIN_ID_PREFIX}.android.compose")
-                apply("${AndroidConfig.PLUGIN_ID_PREFIX}.android.hilt")
+                apply("$pluginIdPrefix.android.library")
+                apply("$pluginIdPrefix.android.compose")
+                apply("$pluginIdPrefix.android.hilt")
             }
 
             extensions.configure<LibraryExtension> {

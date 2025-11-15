@@ -8,8 +8,10 @@ plugins {
     alias(libs.plugins.firebase.perf)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.zencastr"
+    namespace = "${projectProperties.appPackageName}"
 
     flavorDimensions += "environment"
 
@@ -30,7 +32,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.acksession.zencastr"
+        applicationId = projectProperties.appPackageName
         versionCode = rootProject.extra["versionCode"] as Int
         versionName = rootProject.extra["versionName"] as String
     }

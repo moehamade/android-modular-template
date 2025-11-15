@@ -3,14 +3,13 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.feature.profile.api"
+    namespace = "${projectProperties.corePackagePrefix}.feature.profile.api"
 }
 
 dependencies {
-    // Navigation for NavKey and Navigator
     api(project(":core:navigation"))
-
-    // Navigation3 dependencies for @Serializable and NavKey
     api(libs.bundles.navigation3)
 }

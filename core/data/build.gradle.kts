@@ -5,8 +5,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.data"
+    namespace = "${projectProperties.corePackagePrefix}.data"
 }
 
 dependencies {

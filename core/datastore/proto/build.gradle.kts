@@ -5,8 +5,10 @@ plugins {
 //     id("com.google.protobuf") version "0.9.4"
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.datastore.proto"
+    namespace = "${projectProperties.corePackagePrefix}.datastore.proto"
 }
 
 dependencies {

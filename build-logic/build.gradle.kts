@@ -7,7 +7,7 @@ group = "com.acksession.zencastr.buildlogic"
 val pluginIdPrefix = "convention"
 
 dependencies {
-    compileOnly(libs.android.gradlePlugin)
+    implementation(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)
@@ -48,5 +48,10 @@ gradlePlugin {
             id = "$pluginIdPrefix.scaffolding.feature"
             implementationClass = "FeatureScaffoldingConventionPlugin"
         }
+        register("projectProperties") {
+            id = "$pluginIdPrefix.project.properties"
+            implementationClass = "ProjectPropertiesConventionPlugin"
+        }
+
     }
 }

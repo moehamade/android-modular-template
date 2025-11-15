@@ -1,7 +1,6 @@
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import java.util.Properties
 
-// Load version from version.properties
 val versionPropsFile = file("version.properties")
 val versionProps = Properties().apply {
     if (versionPropsFile.exists()) {
@@ -27,6 +26,7 @@ plugins {
     alias(libs.plugins.room) apply false
     alias(libs.plugins.detekt) // Applied to root to create aggregated detekt task for CI/CD
     alias(libs.plugins.convention.scaffolding.feature)
+    alias(libs.plugins.convention.project.properties) // Applied to root to make projectProperties available
 }
 
 // Configure Detekt for root project (aggregates all subproject results)

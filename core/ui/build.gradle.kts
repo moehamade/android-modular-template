@@ -3,8 +3,10 @@ plugins {
     alias(libs.plugins.convention.android.compose)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.ui"
+    namespace = "${projectProperties.corePackagePrefix}.ui"
 }
 
 dependencies {

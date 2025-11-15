@@ -2,8 +2,10 @@ plugins {
     alias(libs.plugins.convention.android.feature)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.feature.profile"
+    namespace = "${projectProperties.corePackagePrefix}.feature.profile"
 }
 
 dependencies {

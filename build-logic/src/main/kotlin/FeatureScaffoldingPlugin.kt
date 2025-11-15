@@ -7,7 +7,7 @@ import org.gradle.api.tasks.Input
 import java.io.File
 import java.util.Locale
 
-// Plugin to register the task
+@Suppress("unused")
 class FeatureScaffoldingConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         if (project.parent == null) {
@@ -34,7 +34,9 @@ abstract class CreateFeatureTask : DefaultTask() {
         }
 
         val camelCaseName = name.replaceFirstChar { it.titlecase(Locale.ROOT) }
-        val namespacePrefix = AndroidConfig.NAMESPACE_PREFIX
+        val projectProperties = project.rootProject.extensions.getByType(ProjectProperties::class.java)
+        val namespacePrefix = projectProperties.corePackagePrefix
+        val pluginIdPrefix = projectProperties.pluginIdPrefix
         val rootDir = project.rootDir
 
         val featureModulePath = "feature/$name"
@@ -53,8 +55,8 @@ abstract class CreateFeatureTask : DefaultTask() {
         createSrcDirectories(apiDir, "$namespacePrefix.feature.$name.api")
 
         // Create Build Files
-        createFeatureBuildGradle(featureDir, name, namespacePrefix)
-        createApiBuildGradle(apiDir, name, namespacePrefix)
+        createFeatureBuildGradle(featureDir, name, namespacePrefix, pluginIdPrefix)
+        createApiBuildGradle(apiDir, name, namespacePrefix, pluginIdPrefix)
 
         // Create Manifests
         createAndroidManifest(featureDir)
@@ -81,10 +83,10 @@ abstract class CreateFeatureTask : DefaultTask() {
         File(moduleDir, "src/main/java/$packagePath").mkdirs()
     }
 
-    private fun createFeatureBuildGradle(moduleDir: File, name: String, namespacePrefix: String) {
+    private fun createFeatureBuildGradle(moduleDir: File, name: String, namespacePrefix: String, pluginIdPrefix: String) {
         File(moduleDir, "build.gradle.kts").writeText("""
             plugins {
-                alias(libs.plugins.${AndroidConfig.PLUGIN_ID_PREFIX}.android.feature)
+                alias(libs.plugins.$pluginIdPrefix.android.feature)
             }
 
             android {
@@ -100,10 +102,10 @@ abstract class CreateFeatureTask : DefaultTask() {
         """.trimIndent())
     }
 
-    private fun createApiBuildGradle(moduleDir: File, name: String, namespacePrefix: String) {
+    private fun createApiBuildGradle(moduleDir: File, name: String, namespacePrefix: String, pluginIdPrefix: String) {
         File(moduleDir, "build.gradle.kts").writeText("""
             plugins {
-                alias(libs.plugins.${AndroidConfig.PLUGIN_ID_PREFIX}.android.library)
+                alias(libs.plugins.$pluginIdPrefix.android.library)
                 alias(libs.plugins.kotlin.serialization)
             }
 

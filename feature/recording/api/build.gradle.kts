@@ -3,8 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.feature.recording.api"
+    namespace = "${projectProperties.corePackagePrefix}.feature.recording.api"
 }
 
 dependencies {

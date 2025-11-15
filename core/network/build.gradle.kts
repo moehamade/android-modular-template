@@ -4,8 +4,10 @@ plugins {
     alias(libs.plugins.convention.android.network)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.network"
+    namespace = "${projectProperties.corePackagePrefix}.network"
 
     defaultConfig {
         // Allow BuildConfig to be configured from app module via DI
@@ -16,7 +18,6 @@ android {
 }
 
 dependencies {
-    // DataStore preferences - for token storage (NO circular dependency!)
     implementation(project(":core:datastore:preferences"))
 
     // Network convention plugin provides:

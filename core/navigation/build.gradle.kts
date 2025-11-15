@@ -4,8 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.navigation"
+    namespace = "${projectProperties.corePackagePrefix}.navigation"
 }
 
 dependencies {

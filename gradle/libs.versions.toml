@@ -202,6 +202,7 @@ convention-android-room = { id = "convention.android.room" }
 convention-android-feature = { id = "convention.android.feature" }
 convention-android-network = { id = "convention.android.network" }
 convention-scaffolding-feature = { id = "convention.scaffolding.feature" }
+convention-project-properties = { id = "convention.project.properties" }
 
 [bundles]
 compose = [

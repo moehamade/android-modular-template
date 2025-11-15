@@ -3,8 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "com.acksession.feature.settings.api"
+    namespace = "${projectProperties.corePackagePrefix}.feature.settings.api"
 }
 
 dependencies {

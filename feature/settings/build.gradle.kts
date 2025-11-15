@@ -2,16 +2,14 @@ plugins {
     alias(libs.plugins.convention.android.feature)
 }
 
+val projectProperties: ProjectProperties by rootProject.extensions
+
 android {
-    namespace = "com.acksession.feature.settings"
+    namespace = "${projectProperties.corePackagePrefix}.feature.settings"
 }
 
 dependencies {
     implementation(project(":feature:settings:api"))
-
-    // Core dependencies for settings functionality
     implementation(project(":core:datastore:preferences"))
     implementation(project(":core:network"))
-
-    // Add feature-specific dependencies here
 }
