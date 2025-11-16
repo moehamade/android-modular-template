@@ -94,6 +94,50 @@ android-modular-template/
 └── build-logic/                # Gradle convention plugins
 ```
 
+### Type-Safe Cross-Feature Navigation
+
+One of the unique features of this template is the **`:api` module pattern** for type-safe navigation between features without tight coupling:
+
+```mermaid
+graph LR
+    subgraph Recording [":feature:recording"]
+        RecordingImpl["RecordingScreen"]
+    end
+
+    subgraph RecordingAPI [":feature:recording:api"]
+        RecordingRoute["RecordingRoute<br/>@Serializable"]
+    end
+
+    subgraph Profile [":feature:profile"]
+        ProfileImpl["ProfileScreen"]
+    end
+
+    subgraph ProfileAPI [":feature:profile:api"]
+        ProfileRoute["ProfileRoute<br/>@Serializable"]
+    end
+
+    RecordingImpl -->|depends on| ProfileAPI
+    ProfileImpl -->|depends on| RecordingAPI
+
+    RecordingImpl -.->|❌ NO dependency| ProfileImpl
+
+    classDef implModule fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef apiModule fill:#fff3e0,stroke:#e65100,stroke-width:2px,stroke-dasharray: 5 5
+
+    class Recording,Profile implModule
+    class RecordingAPI,ProfileAPI apiModule
+```
+
+**Key Benefits:**
+- ✅ **No tight coupling** - Features don't depend on each other's implementation
+- ✅ **Type-safe navigation** - Compile-time safety with sealed interfaces & `@Serializable`
+- ✅ **Independent development** - Teams can work on features in parallel
+- ✅ **Easy testing** - Mock navigation contracts without full feature modules
+
+**Example:** Recording feature can navigate to Profile by depending only on `:feature:profile:api`, not the entire `:feature:profile` module.
+
+**📊 [View all architecture diagrams →](docs/images/architecture-mermaid.md)** (Module dependencies, Clean Architecture layers, Data flow, Build variants, Firebase integration, CI/CD pipeline)
+
 ## Getting Started
 
 ### Prerequisites
@@ -134,6 +178,8 @@ The template includes a powerful rebrand script that automatically renames every
              --package-name com.mycompany.myapp \
              --reset-git
 ```
+
+**📋 [See example output →](docs/rebrand-example-output.txt)** (shows what happens during rebranding)
 
 **The script automatically:**
 - ✅ Replaces package names (`com.example` → `com.mycompany.myapp`)
@@ -354,35 +400,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more troubleshooting tips.
 
 ## Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
-- Commit message conventions
-- Code style guidelines
-- Pull request process
-- Module creation guidelines
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License
-
-Copyright (c) 2025 Moe Hamade
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-## Author
-
-Created and maintained by **[Moe Hamade](https://github.com/moehamade)**
-
-## Acknowledgments
-
-Built with inspiration from:
-- [Now in Android](https://github.com/android/nowinandroid) by Google
-- Android Architecture Blueprints
-- Modern Android Development best practices
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Questions?** Open an issue or check the [documentation](docs/).
+**Created by [Moe Hamade](https://github.com/moehamade)** • Inspired by [Now in Android](https://github.com/android/nowinandroid)

@@ -1,0 +1,99 @@
+$ ./rebrand.sh --project-name MyShopApp --package-name com.acme.shop --app-name "My Shop"
+
+════════════════════════════════════════
+  Android Modular Template - Rebranding
+════════════════════════════════════════
+
+Rebranding Summary
+──────────────────────────────────────
+
+Current project:     MyApp
+New project:         MyShopApp
+
+Current package:     com.example.myapp (base: com.example)
+New package:         com.acme.shop (base: com.acme)
+
+App display name:    My Shop
+
+Dry run:             false
+Reset git:           false
+
+Continue with rebranding? [y/N]: y
+
+════════════════════════════════════════
+Step 1: Updating template.properties
+════════════════════════════════════════
+
+✓ Updated template.properties
+
+════════════════════════════════════════
+Step 2: Renaming Package Directories
+════════════════════════════════════════
+
+▶ Auto-detecting current package structure...
+  Detected current base: com.example → com.acme
+  Detected current app:  com.example.myapp → com.acme.shop
+
+  Renaming: app/src/main/java/com/example/myapp → app/src/main/java/com/acme/shop
+  Renaming: core/ui/src/main/java/com/example → core/ui/src/main/java/com/acme
+  Renaming: core/common/src/main/java/com/example → core/common/src/main/java/com/acme
+  Renaming: core/navigation/src/main/java/com/example → core/navigation/src/main/java/com/acme
+  ... (15 more modules)
+
+✓ Package directories renamed
+
+▶ Updating package declarations in .kt and .java files...
+  Updated: app/src/main/java/com/acme/shop/MainApplication.kt
+  Updated: app/src/main/java/com/acme/shop/MainActivity.kt
+  Updated: core/ui/src/main/java/com/acme/ui/theme/Theme.kt
+  ... (142 files updated)
+
+✓ Package declarations updated
+
+════════════════════════════════════════
+Step 3: Verifying Auto-Configuration
+════════════════════════════════════════
+
+✓ settings.gradle.kts reads rootProject.name from template.properties automatically
+✓ app/build.gradle.kts auto-generates from template.properties:
+    - String resources (app_name)
+    - Manifest placeholders (deep links, app links, theme)
+    - BuildConfig values (API_BASE_URL)
+
+✓ All configurations will update automatically on next Gradle sync
+
+════════════════════════════════════════
+Step 4: Cleaning Build
+════════════════════════════════════════
+
+▶ Running ./gradlew clean...
+
+BUILD SUCCESSFUL in 8s
+1 actionable task: 1 executed
+
+✓ Build cleaned successfully
+
+════════════════════════════════════════
+Rebranding Complete!
+════════════════════════════════════════
+
+✓ Project successfully rebranded to MyShopApp
+
+Summary of changes:
+  Package:     com.example.myapp → com.acme.shop
+  Base:        com.example → com.acme (auto-derived)
+  Project:     MyApp → MyShopApp
+  App name:    My Shop
+
+⚠ Next steps:
+  1. Open the project in Android Studio and sync Gradle
+  2. Review changes with 'git diff'
+  3. Set up Firebase:
+     - Create project at https://console.firebase.google.com
+     - Add Android app with package: com.acme.shop
+     - Download google-services.json to app/ directory
+     - See GETTING_STARTED.md#12-firebase-configuration for details
+  4. Build the app: ./gradlew :app:assembleDevDebug
+  5. Commit changes: git add . && git commit -m 'Rebrand to MyShopApp'
+
+✓ Happy coding! 🚀
