@@ -23,7 +23,7 @@ Contains the core business rules, entities, and use cases that define what the a
 ## Structure
 
 ```
-com.acksession.domain
+com.example.domain
 ├── model/          # Domain entities
 ├── usecase/        # Business operations
 └── repository/     # Repository contracts (interfaces)

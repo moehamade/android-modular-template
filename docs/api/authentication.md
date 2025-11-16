@@ -1,6 +1,6 @@
 # Authentication API
 
-**Base URL**: `https://api.zencastr.com/v1/auth`
+**Base URL**: `https://api.MyApp.com/v1/auth`
 
 **Status**: 🚧 Mock endpoints - Real API not yet implemented
 

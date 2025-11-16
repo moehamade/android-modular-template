@@ -2,12 +2,12 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "com.acksession.zencastr.buildlogic"
+group = "com.example.myapp.buildlogic"
 
 val pluginIdPrefix = "convention"
 
 dependencies {
-    implementation(libs.android.gradlePlugin)
+    compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)

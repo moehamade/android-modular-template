@@ -6,7 +6,7 @@
 
 ## Context
 
-Android projects can be structured as a single monolithic module or split into multiple modules. As Zencastr is intended to be a company-wide base project with potential for open-source contributions, we needed a scalable architecture that supports:
+Android projects can be structured as a single monolithic module or split into multiple modules. As this is intended to be a reusable template project with potential for open-source contributions, we needed a scalable architecture that supports:
 
 - Multiple feature teams working in parallel
 - Independent feature development and testing

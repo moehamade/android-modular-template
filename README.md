@@ -147,10 +147,7 @@ The template includes a powerful rebrand script that automatically renames every
 **Step 3: Firebase Setup** (Required)
 
 Create Firebase project and download `google-services.json`:
-```bash
-# See detailed instructions:
-cat app/README_FIREBASE_SETUP.md
-```
+- See detailed instructions in [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration)
 
 **Step 4: Build and run**
 ```bash
@@ -168,7 +165,7 @@ If you prefer manual setup:
    ```
 
 2. **Configure Firebase** (required for build)
-   - See `app/README_FIREBASE_SETUP.md`
+   - See [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration)
    - Download `google-services.json` to `app/` directory
 
 3. **Sync and build**
@@ -300,12 +297,17 @@ See `MANUAL_SETUP_REQUIRED.md` for Play Store deployment setup.
 
 ## Documentation
 
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines, coding standards
-- **[CLAUDE.md](CLAUDE.md)** - AI assistant development guide (comprehensive architecture docs)
-- **[docs/architecture/](docs/architecture/)** - Architecture Decision Records (ADRs)
-- **[docs/api/](docs/api/)** - API documentation
-- **[MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md)** - Production setup checklist
-- **[NEXT_STEPS.md](NEXT_STEPS.md)** - Quick reference for next steps
+### Getting Started
+- **[NEXT_STEPS.md](NEXT_STEPS.md)** - 📍 **Start here!** Quick status check and what to do next
+- **[MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md)** - 📖 Detailed step-by-step setup guide (Firebase, keystore, Play Store)
+
+### Development
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines, commit conventions, code style
+- **[CLAUDE.md](CLAUDE.md)** - AI assistant guide with comprehensive architecture documentation
+
+### Reference
+- **[docs/architecture/](docs/architecture/)** - Architecture Decision Records (ADRs) - why we made key decisions
+- **[docs/api/](docs/api/)** - API endpoint documentation and contracts
 
 ## Customization Guide
 
@@ -335,7 +337,7 @@ After rebranding:
 ## Troubleshooting
 
 **Build fails with "google-services.json not found"**:
-- See `app/README_FIREBASE_SETUP.md` for setup instructions
+- See [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration) for setup instructions
 - For CI/CD, add `GOOGLE_SERVICES_JSON` GitHub secret
 
 **Import/sync issues**:

@@ -62,7 +62,7 @@ viewModel.onProfileClick { userId ->
 ## Module Structure
 
 ```
-com.acksession.navigation
+com.example.navigation
 ├── NavKey.kt           # Base interface for routes
 ├── Navigator.kt        # Navigation wrapper
 └── EntryProvider.kt    # Feature registration interface

@@ -4,7 +4,7 @@
 # Application package name
 # Production flavor uses base package name
 # Dev flavor adds .dev suffix automatically
-package_name("com.acksession.zencastr")
+package_name("com.example.myapp")
 
 # TODO: Add your Play Store service account JSON key path
 # This is used for automated Play Store uploads

@@ -30,7 +30,7 @@
 - ✅ 3 new core modules: `:core:analytics`, `:core:notifications`, `:core:remoteconfig`
 - ✅ Firebase integration (Crashlytics, Analytics, Performance, FCM, Remote Config)
 - ✅ Product flavors (dev/prod) with separate environments
-- ✅ ZencastrApplication with production-safe global exception handler
+- ✅ Application class with production-safe global exception handler
 - ✅ Deep links (custom scheme + App Links)
 - ✅ FCM service configured in manifest
 - ✅ POST_NOTIFICATIONS permission for Android 13+
@@ -93,19 +93,19 @@
 
 ```bash
 # Generate keystore
-keytool -genkey -v -keystore zencastr-release.jks \
-  -alias zencastr -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkey -v -keystore myapp-release.jks \
+  -alias myapp -keyalg RSA -keysize 2048 -validity 10000
 
 # Create keystore.properties
 cat > keystore.properties << EOF
-storeFile=../zencastr-release.jks
+storeFile=../myapp-release.jks
 storePassword=YOUR_PASSWORD
-keyAlias=zencastr
+keyAlias=myapp
 keyPassword=YOUR_PASSWORD
 EOF
 ```
 
-**⚠️ CRITICAL**: Backup `zencastr-release.jks` securely - if lost, you can't update your app!
+**⚠️ CRITICAL**: Backup `myapp-release.jks` securely - if lost, you can't update your app!
 
 **Detailed guide**: [`MANUAL_SETUP_REQUIRED.md#3-generate-release-keystore`](./MANUAL_SETUP_REQUIRED.md#3-generate-release-keystore)
 
@@ -121,16 +121,16 @@ Add these in **Settings → Secrets and variables → Actions**:
 
 | Secret Name | How to Get | Required For |
 |-------------|------------|--------------|
-| `ANDROID_KEYSTORE_BASE64` | `cat zencastr-release.jks \| base64` | Signed builds |
+| `ANDROID_KEYSTORE_BASE64` | `cat myapp-release.jks \| base64` | Signed builds |
 | `KEYSTORE_PASSWORD` | Password from keytool | Signed builds |
-| `KEY_ALIAS` | `zencastr` (from keytool) | Signed builds |
+| `KEY_ALIAS` | `myapp` (from keytool) | Signed builds |
 | `KEY_PASSWORD` | Password from keytool | Signed builds |
 | `PLAY_STORE_SERVICE_ACCOUNT` | Google Cloud Console | Play Store upload |
 
 ### 5. Create Play Store Service Account
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create service account: `zencastr-github-actions`
+2. Create service account: `myapp-github-actions`
 3. Download JSON key
 4. Link to Play Console: **Setup → API access**
 5. Grant "Admin" or "Release manager" permissions
@@ -194,7 +194,7 @@ fastlane deploy_production  # Promote beta to production
 - 📕 **[CLAUDE.md](./CLAUDE.md)** - Project overview and architecture
 
 **Specific Guides**:
-- 🔥 **[app/README_FIREBASE_SETUP.md](./app/README_FIREBASE_SETUP.md)** - Firebase Console setup
+- 🔥 **[MANUAL_SETUP_REQUIRED.md](./MANUAL_SETUP_REQUIRED.md#1-firebase-configuration)** - Firebase Console setup
 - 🏗️ **[scripts/README.md](./scripts/README.md)** - Version management
 - ⚙️ **[.github/workflows/README.md](./.github/workflows/README.md)** - CI/CD workflows
 - 🚢 **[.github/workflows/README_DEPLOY.md](./.github/workflows/README_DEPLOY.md)** - How to enable Play Store deployment
@@ -235,7 +235,7 @@ fastlane deploy_production  # Promote beta to production
 
 ## 🆘 Need Help?
 
-- **Build issues**: Check [`app/README_FIREBASE_SETUP.md`](./app/README_FIREBASE_SETUP.md)
+- **Build issues**: Check [`MANUAL_SETUP_REQUIRED.md#1-firebase-configuration`](./MANUAL_SETUP_REQUIRED.md#1-firebase-configuration)
 - **CI/CD issues**: Check [`.github/workflows/README.md`](./.github/workflows/README.md)
 - **Play Store setup**: See [`.github/workflows/README_DEPLOY.md`](./.github/workflows/README_DEPLOY.md)
 - **Troubleshooting**: See [`MANUAL_SETUP_REQUIRED.md#troubleshooting`](./MANUAL_SETUP_REQUIRED.md#troubleshooting)

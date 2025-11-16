@@ -1,4 +1,4 @@
-Zencastr - Professional Podcast Recording
+MyApp - Professional Podcast Recording
 
 Record high-quality podcast interviews and remote conversations with ease.
 

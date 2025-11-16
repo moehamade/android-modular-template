@@ -10,15 +10,10 @@ android {
 }
 
 dependencies {
-    // Firebase BOM (Bill of Materials) - manages versions
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.perf)
-
-    // Timber for logging
     implementation(libs.timber)
-
-    // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 }

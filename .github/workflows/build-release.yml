@@ -113,9 +113,9 @@ jobs:
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          name: Zencastr v${{ steps.version.outputs.name }}
+          name: MyApp v${{ steps.version.outputs.name }}
           body: |
-            ## Zencastr v${{ steps.version.outputs.name }}
+            ## MyApp v${{ steps.version.outputs.name }}
 
             **Build**: ${{ steps.version.outputs.code }}
             **Type**: Pre-release (unsigned APKs for testing)

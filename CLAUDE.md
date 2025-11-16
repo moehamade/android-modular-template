@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Create Firebase project at [Firebase Console](https://console.firebase.google.com)
    - Add Android app with package: `com.example.myapp` (or your chosen package name)
    - Download `google-services.json` and place in `app/` directory
-   - See `app/README_FIREBASE_SETUP.md` for detailed instructions
+   - See [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration) for detailed instructions
    - **Note**: Update package name after rebranding the project
 
 2. **Verify Setup**:
@@ -376,7 +376,7 @@ Example: `https://example.com/content/123`
 
 **Required**: Add `google-services.json` from Firebase Console to `app/` directory.
 
-See `app/README_FIREBASE_SETUP.md` for detailed setup instructions:
+See [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration) for detailed setup instructions:
 1. Create Firebase project
 2. Add Android app with your package name (e.g., `com.example.myapp`)
 3. Download `google-services.json`
@@ -590,7 +590,6 @@ Located in `docs/api/`:
 Production readiness documentation:
 - **`MANUAL_SETUP_REQUIRED.md`** - Step-by-step setup guide (Firebase, keystore, Play Store)
 - **`NEXT_STEPS.md`** - Quick reference and current status
-- **`app/README_FIREBASE_SETUP.md`** - Firebase Console setup instructions
 - **`docs/PRODUCTION_SETUP.md`** - Release keystore, signing, Play Store submission
 
 **Current Status: 100% Development Ready** 🎉

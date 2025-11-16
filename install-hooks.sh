@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install git hooks for the Zencastr project
+# Install git hooks for the MyApp project
 # Run this script once after cloning the repository
 
 HOOKS_DIR=".githooks"
@@ -34,7 +34,7 @@ echo "Pre-commit checks will now run automatically before each commit."
 echo "To skip hooks (not recommended): git commit --no-verify"
 #!/bin/bash
 
-# Pre-commit hook for Zencastr Android project
+# Pre-commit hook for MyApp Android project
 # Runs code quality checks before allowing commits
 
 set -e

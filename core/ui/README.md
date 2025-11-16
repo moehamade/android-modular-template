@@ -29,9 +29,9 @@ This module provides a consistent visual language throughout the app. Any reusab
 ## Structure
 
 ```
-com.acksession.ui
+<base-package>.ui
 ├── theme/
-│   ├── Theme.kt        # ZencastrTheme composable
+│   ├── Theme.kt        # AppTheme composable
 │   ├── Color.kt        # Color palette
 │   └── Type.kt         # Typography definitions
 └── components/         # Reusable composables
@@ -44,7 +44,7 @@ Apply the theme in your feature module:
 ```kotlin
 @Composable
 fun MyScreen() {
-    ZencastrTheme {
+    MyAppTheme {
         // Your UI here
     }
 }
@@ -64,7 +64,7 @@ Text(
 
 When creating reusable components:
 
-1. Place in `com.acksession.ui.components`
+1. Place in `<base-package>.ui.components`
 2. Keep them generic and configurable
 3. Add `@Preview` annotations
 4. Document parameters with KDoc

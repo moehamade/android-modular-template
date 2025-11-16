@@ -6,7 +6,7 @@
 
 ## Context
 
-Zencastr stores sensitive authentication data:
+This project stores sensitive authentication data:
 - **Access tokens** (JWT) - Short-lived, grants API access
 - **Refresh tokens** (JWT) - Long-lived, used to obtain new access tokens
 - **User ID** - Identifies the current user
@@ -298,7 +298,7 @@ Located in `core/datastore/preferences/consumer-rules.pro`:
 -dontwarn org.joda.time.Instant
 
 # Project-specific
--keep class com.acksession.datastore.preferences.TinkAuthStorage { *; }
+-keep class com.example.datastore.preferences.TinkAuthStorage { *; }
 ```
 
 ## Related ADRs
@@ -338,9 +338,9 @@ Created dedicated `:core:common` module to resolve architectural dependency conc
 ```kotlin
 @Qualifier
 @Retention(RUNTIME)
-annotation class Dispatcher(val dispatcher: ZencastrDispatchers)
+annotation class Dispatcher(val dispatcher: AppDispatchers)
 
-enum class ZencastrDispatchers {
+enum class AppDispatchers {
     Default,  // CPU-bound work
     IO,       // I/O operations
     Main,     // UI updates
@@ -356,7 +356,7 @@ enum class ZencastrDispatchers {
 **Benefits:**
 - ✅ Clean separation: Domain layer no longer owns infrastructure
 - ✅ Reusable: All layers can depend on `:core:common` without circular dependencies
-- ✅ Type-safe: `@Dispatcher(ZencastrDispatchers.IO)` prevents mistakes at compile-time
+- ✅ Type-safe: `@Dispatcher(AppDispatchers.IO)` prevents mistakes at compile-time
 - ✅ Follows Now in Android best practices
 
 **Module Dependencies:**

@@ -1,4 +1,4 @@
-# Fastlane configuration for Zencastr Android app
+# Fastlane configuration for MyApp Android app
 # https://docs.fastlane.tools
 
 default_platform(:android)

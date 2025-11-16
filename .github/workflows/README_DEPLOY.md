@@ -52,8 +52,8 @@ Re-enable when you're ready to publish to Play Store:
 
 ```bash
 keytool -genkey -v \
-  -keystore zencastr-release.jks \
-  -alias zencastr \
+  -keystore myapp-release.jks \
+  -alias myapp \
   -keyalg RSA \
   -keysize 2048 \
   -validity 10000
@@ -73,13 +73,13 @@ keytool -genkey -v \
 
 Add these in **Settings → Secrets and variables → Actions**:
 
-| Secret Name | How to Get |
-|-------------|------------|
-| `ANDROID_KEYSTORE_BASE64` | `cat zencastr-release.jks \| base64 \| pbcopy` |
-| `KEYSTORE_PASSWORD` | Password from keytool |
-| `KEY_ALIAS` | `zencastr` (from keytool) |
-| `KEY_PASSWORD` | Password from keytool |
-| `PLAY_STORE_SERVICE_ACCOUNT` | Paste entire JSON from service account |
+| Secret Name | How to Get                                  |
+|-------------|---------------------------------------------|
+| `ANDROID_KEYSTORE_BASE64` | `cat myapp-release.jks \| base64 \| pbcopy` |
+| `KEYSTORE_PASSWORD` | Password from keytool                       |
+| `KEY_ALIAS` | `myapp` (from keytool)                      |
+| `KEY_PASSWORD` | Password from keytool                       |
+| `PLAY_STORE_SERVICE_ACCOUNT` | Paste entire JSON from service account      |
 
 ### Step 4: Uncomment Signing Config
 

@@ -171,7 +171,7 @@ jobs:
           tag_name: v${{ steps.version.outputs.name }}
           release_name: Release v${{ steps.version.outputs.name }}
           body: |
-            ## Zencastr v${{ steps.version.outputs.name }}
+            ## MyApp v${{ steps.version.outputs.name }}
 
             Build: ${{ steps.version.outputs.code }}
             Track: ${{ github.event.inputs.track }}

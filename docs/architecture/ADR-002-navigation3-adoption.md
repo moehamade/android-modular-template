@@ -11,7 +11,7 @@ Android navigation has evolved through several iterations:
 - Navigation Component (Jetpack Navigation, aka Navigation2)
 - **Navigation3** (latest, alpha as of Oct 2025)
 
-For Zencastr, we needed a navigation solution that supports:
+For this project, we needed a navigation solution that supports:
 - Type-safe navigation with compile-time checks
 - Deep linking support
 - Multi-module navigation without coupling

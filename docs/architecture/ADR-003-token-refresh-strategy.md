@@ -6,7 +6,7 @@
 
 ## Context
 
-Zencastr uses JWT authentication with:
+This project uses JWT authentication with:
 - **Access tokens** - Short-lived (15-60 minutes)
 - **Refresh tokens** - Long-lived (7-30 days)
 

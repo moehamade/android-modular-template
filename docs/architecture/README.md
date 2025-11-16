@@ -1,6 +1,6 @@
 # Architecture Decision Records (ADRs)
 
-This directory contains Architecture Decision Records documenting important architectural decisions made in the Zencastr project.
+This directory contains Architecture Decision Records documenting important architectural decisions made in this project.
 
 ## What is an ADR?
 

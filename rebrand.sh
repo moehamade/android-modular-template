@@ -256,13 +256,70 @@ if [[ "$DRY_RUN" == true ]]; then
     echo "  $CURRENT_BASE_PACKAGE → $NEW_BASE_PACKAGE"
     echo "  $CURRENT_PACKAGE → $NEW_PACKAGE"
 else
-    print_step "Renaming Java/Kotlin package directories..."
+    print_step "Auto-detecting current package structure..."
+
+    # Auto-detect actual current package by finding the first package declaration in app module
+    DETECTED_APP_PACKAGE=""
+    if [[ -f "app/src/main/java/com/example/myapp/MainApplication.kt" ]] || [[ -f "app/src/main/java/com/example/myapp/MainActivity.kt" ]]; then
+        # Try to find package declaration from a known app file
+        for app_file in app/src/main/java/*/*/MainActivity.kt app/src/main/java/*/*/MainActivity.kt app/src/main/java/*/*/*/MainActivity.kt; do
+            if [[ -f "$app_file" ]]; then
+                DETECTED_APP_PACKAGE=$(grep "^package " "$app_file" 2>/dev/null | head -1 | sed 's/package //; s/ //g')
+                if [[ -n "$DETECTED_APP_PACKAGE" ]]; then
+                    break
+                fi
+            fi
+        done
+    fi
+
+    # Fallback: Search for any .kt file in app module to detect package
+    if [[ -z "$DETECTED_APP_PACKAGE" ]]; then
+        for kt_file in $(find app/src/main -name "*.kt" -type f | head -5); do
+            DETECTED_APP_PACKAGE=$(grep "^package " "$kt_file" 2>/dev/null | head -1 | sed 's/package //; s/ //g')
+            if [[ -n "$DETECTED_APP_PACKAGE" ]]; then
+                break
+            fi
+        done
+    fi
+
+    # Auto-detect base package by finding the first package in core modules
+    DETECTED_BASE_PACKAGE=""
+    for kt_file in $(find core/*/src/main -name "*.kt" -type f | head -5); do
+        DETECTED_BASE_PACKAGE=$(grep "^package " "$kt_file" 2>/dev/null | head -1 | sed 's/package //; s/ //g' | cut -d'.' -f1-2)
+        if [[ -n "$DETECTED_BASE_PACKAGE" ]]; then
+            break
+        fi
+    done
+
+    # Use detected packages or fall back to directory structure
+    if [[ -n "$DETECTED_APP_PACKAGE" ]]; then
+        ACTUAL_CURRENT_APP="$DETECTED_APP_PACKAGE"
+    else
+        print_warning "Could not auto-detect app package, using directory structure"
+        # Detect from directory structure as fallback
+        APP_PKG_DIR=$(find app/src/main/java -mindepth 3 -maxdepth 3 -type d | head -1)
+        if [[ -n "$APP_PKG_DIR" ]]; then
+            ACTUAL_CURRENT_APP=$(echo "$APP_PKG_DIR" | sed 's|app/src/main/java/||' | tr '/' '.')
+        else
+            ACTUAL_CURRENT_APP="$CURRENT_PACKAGE"
+        fi
+    fi
+
+    if [[ -n "$DETECTED_BASE_PACKAGE" ]]; then
+        ACTUAL_CURRENT_BASE="$DETECTED_BASE_PACKAGE"
+    else
+        # Derive from app package
+        ACTUAL_CURRENT_BASE=$(echo "$ACTUAL_CURRENT_APP" | sed 's/\.[^.]*$//')
+    fi
 
     # Convert package names to paths
-    CURRENT_BASE_PATH=$(echo "$CURRENT_BASE_PACKAGE" | tr '.' '/')
+    CURRENT_BASE_PATH=$(echo "$ACTUAL_CURRENT_BASE" | tr '.' '/')
     NEW_BASE_PATH=$(echo "$NEW_BASE_PACKAGE" | tr '.' '/')
-    CURRENT_APP_PATH=$(echo "$CURRENT_PACKAGE" | tr '.' '/')
+    CURRENT_APP_PATH=$(echo "$ACTUAL_CURRENT_APP" | tr '.' '/')
     NEW_APP_PATH=$(echo "$NEW_PACKAGE" | tr '.' '/')
+
+    echo "  Detected current base: $ACTUAL_CURRENT_BASE → $NEW_BASE_PACKAGE"
+    echo "  Detected current app:  $ACTUAL_CURRENT_APP → $NEW_PACKAGE"
 
     # Rename app package directories first (most specific)
     find . -type d \( -path "*/src/main/java/$CURRENT_APP_PATH" -o -path "*/src/main/kotlin/$CURRENT_APP_PATH" \) 2>/dev/null | while IFS= read -r old_dir; do
@@ -290,6 +347,35 @@ else
     done
 
     print_success "Package directories renamed"
+
+    # Step 2.5: Update package declarations in Kotlin/Java files
+    print_step "Updating package declarations in .kt and .java files..."
+
+    # Replace old base package with new base package in all Kotlin/Java files
+    find . -type f \( -name "*.kt" -o -name "*.java" \) ! -path "*/build/*" ! -path "*/.git/*" 2>/dev/null | while IFS= read -r file; do
+        if grep -q "^package $ACTUAL_CURRENT_BASE" "$file" 2>/dev/null; then
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                sed -i '' "s|^package $ACTUAL_CURRENT_BASE|package $NEW_BASE_PACKAGE|g" "$file"
+            else
+                sed -i "s|^package $ACTUAL_CURRENT_BASE|package $NEW_BASE_PACKAGE|g" "$file"
+            fi
+            echo "  Updated: $file"
+        fi
+    done
+
+    # Replace old app package with new app package
+    find . -type f \( -name "*.kt" -o -name "*.java" \) ! -path "*/build/*" ! -path "*/.git/*" 2>/dev/null | while IFS= read -r file; do
+        if grep -q "^package $ACTUAL_CURRENT_APP" "$file" 2>/dev/null; then
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                sed -i '' "s|^package $ACTUAL_CURRENT_APP|package $NEW_PACKAGE|g" "$file"
+            else
+                sed -i "s|^package $ACTUAL_CURRENT_APP|package $NEW_PACKAGE|g" "$file"
+            fi
+            echo "  Updated: $file"
+        fi
+    done
+
+    print_success "Package declarations updated"
 fi
 
 # Step 3: Verify auto-configuration
@@ -356,7 +442,7 @@ else
     echo "     - Create project at https://console.firebase.google.com"
     echo "     - Add Android app with package: $NEW_PACKAGE"
     echo "     - Download google-services.json to app/ directory"
-    echo "     - See app/README_FIREBASE_SETUP.md for details"
+    echo "     - See MANUAL_SETUP_REQUIRED.md#1-firebase-configuration for details"
     echo "  4. Build the app: ./gradlew :app:assembleDevDebug"
     echo "  5. Commit changes: git add . && git commit -m 'Rebrand to $NEW_PROJECT_NAME'"
     echo ""

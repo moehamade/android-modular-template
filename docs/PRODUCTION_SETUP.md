@@ -1,6 +1,6 @@
 # Production Setup Guide
 
-This guide covers everything needed to prepare Zencastr for production release.
+This guide covers everything needed to prepare the app for production release.
 
 ## ✅ Prerequisites
 
@@ -15,9 +15,9 @@ This guide covers everything needed to prepare Zencastr for production release.
 ## 🔐 Step 1: Generate Release Keystore
 
 ```bash
-keytool -genkey -v -keystore zencastr-release.jks \
+keytool -genkey -v -keystore myapp-release.jks \
   -keyalg RSA -keysize 2048 -validity 10000 \
-  -alias zencastr
+  -alias myapp
 ```
 
 **Store the keystore securely!**
@@ -27,9 +27,9 @@ keytool -genkey -v -keystore zencastr-release.jks \
 Create this file in the project root (it's gitignored):
 
 ```properties
-storeFile=../zencastr-release.jks
+storeFile=../myapp-release.jks
 storePassword=YOUR_STORE_PASSWORD
-keyAlias=zencastr
+keyAlias=myapp
 keyPassword=YOUR_KEY_PASSWORD
 ```
 
@@ -66,7 +66,7 @@ Update in `app/build.gradle.kts`:
 
 ```kotlin
 defaultConfig {
-    buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com/\"")
+    buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
 }
 ```
 
@@ -74,10 +74,10 @@ For staging/production variants:
 ```kotlin
 buildTypes {
     debug {
-        buildConfigField("String", "API_BASE_URL", "\"https://staging.zencastr.com/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://staging.example.com/\"")
     }
     release {
-        buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
     }
 }
 ```
@@ -122,7 +122,7 @@ If release build crashes:
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Create new project or use existing
-3. Add Android app with package `com.acksession.zencastr`
+3. Add Android app with package matching your `template.properties`
 4. Download `google-services.json` → place in `app/`
 
 ### 4.2 Update Dependencies
@@ -161,8 +161,8 @@ dependencies {
 ### 4.3 Initialize in Application Class
 
 ```kotlin
-// In ZencastrApplication.kt
-class ZencastrApplication : Application() {
+// In Application class
+class MyAppApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
@@ -223,12 +223,12 @@ Choose appropriate category (e.g., "Productivity" or "Music & Audio").
 ```bash
 # Use bundletool to test
 bundletool build-apks --bundle=app/build/outputs/bundle/release/app-release.aab \
-  --output=zencastr.apks \
-  --ks=zencastr-release.jks \
-  --ks-key-alias=zencastr
+  --output=myapp.apks \
+  --ks=myapp-release.jks \
+  --ks-key-alias=myapp
 
 # Install on connected device
-bundletool install-apks --apks=zencastr.apks
+bundletool install-apks --apks=myapp.apks
 ```
 
 ---

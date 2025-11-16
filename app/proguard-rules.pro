@@ -1,5 +1,5 @@
 # ================================================================================================
-# Zencastr Android - App Module R8 Configuration
+# MyApp Android - App Module R8 Configuration
 # ================================================================================================
 # This file contains ONLY app-level ProGuard rules.
 # Library-specific rules are distributed across modules in their consumer-rules.pro files:

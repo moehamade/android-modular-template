@@ -1,6 +1,6 @@
-# Contributing to Zencastr
+# Contributing to Android Modular Template
 
-Thanks for your interest in contributing to Zencastr! This guide will help you get started and understand our development workflow.
+Thanks for your interest in contributing! This guide will help you get started and understand our development workflow.
 
 ## Getting Started
 
@@ -20,7 +20,7 @@ Thanks for your interest in contributing to Zencastr! This guide will help you g
 
 ## Architecture Overview
 
-Zencastr follows Clean Architecture with a multi-module approach. Before contributing, familiarize yourself with:
+This project follows Clean Architecture with a multi-module approach. Before contributing, familiarize yourself with:
 
 - **Multi-module structure**: Features are isolated in separate modules
 - **Convention plugins**: We use custom Gradle plugins in `build-logic/` to maintain consistency
@@ -145,7 +145,7 @@ Closes #456
 When creating new files, follow these package conventions:
 
 ```
-com.acksession.<module>
+<base-package>.<module>
     ├── ui/           # Composables, screens
     ├── viewmodel/    # ViewModels
     ├── model/        # UI models, state classes
@@ -176,13 +176,13 @@ If you need to create a core module manually:
 
 ```kotlin
 plugins {
-    id("zencastr.android.library")
-    id("zencastr.android.compose") // if needed
-    id("zencastr.android.hilt")    // if needed
+    alias(libs.plugins.convention.android.library)
+    alias(libs.plugins.convention.android.compose) // if needed
+    alias(libs.plugins.convention.android.hilt)    // if needed
 }
 
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.modulename"
+    namespace = "${projectProperties.corePackagePrefix}.modulename"
 }
 
 dependencies {

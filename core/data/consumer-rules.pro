@@ -14,9 +14,9 @@
 -dontwarn androidx.room.paging.**
 
 # Project-specific: Keep entities and DAOs
--keep class com.acksession.data.local.entity.** { *; }
--keep class com.acksession.data.local.dao.** { *; }
--keep class com.acksession.data.local.AppDatabase { *; }
+-keep class com.example.data.local.entity.** { *; }
+-keep class com.example.data.local.dao.** { *; }
+-keep class com.example.data.local.AppDatabase { *; }
 
 # ================================================================================================
 # Kotlin Coroutines (for Flow in repositories)

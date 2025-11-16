@@ -1,6 +1,6 @@
 # GitHub Actions Workflows
 
-This directory contains CI/CD workflows for the Zencastr Android project.
+This directory contains CI/CD workflows for the Android project.
 
 ## Workflows
 
@@ -73,19 +73,19 @@ Base64-encoded keystore file.
 **How to create**:
 ```bash
 # Create keystore if you don't have one
-keytool -genkey -v -keystore zencastr-release.jks \
-  -alias zencastr -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkey -v -keystore myapp-release.jks \
+  -alias myapp -keyalg RSA -keysize 2048 -validity 10000
 
 # Encode to base64
-base64 -i zencastr-release.jks | pbcopy  # macOS
-base64 -w 0 zencastr-release.jks | xclip  # Linux
+base64 -i myapp-release.jks | pbcopy  # macOS
+base64 -w 0 myapp-release.jks | xclip  # Linux
 ```
 
 #### 2. `KEYSTORE_PASSWORD`
 Password for the keystore file.
 
 #### 3. `KEY_ALIAS`
-Alias of the key in the keystore (e.g., `zencastr`).
+Alias of the key in the keystore (e.g., `myapp`).
 
 #### 4. `KEY_PASSWORD`
 Password for the specific key.

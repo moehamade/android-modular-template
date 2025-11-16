@@ -1,6 +1,6 @@
 # Manual Setup Required
 
-This document contains **step-by-step instructions** for all manual configuration tasks required to build and deploy the Zencastr Android app.
+This document contains **step-by-step instructions** for all manual configuration tasks required to build and deploy the Android app.
 
 ---
 
@@ -58,14 +58,14 @@ This document contains **step-by-step instructions** for all manual configuratio
 
 1. Go to [Firebase Console](https://console.firebase.google.com)
 2. Click **"Add project"** or select an existing project
-3. Name it **"Zencastr"** (or your preferred name)
+3. Name it **"MyApp"** (or your preferred name)
 4. Follow the wizard (Google Analytics is optional)
 
 #### Step 2: Add Android App to Firebase Project
 
 1. In your Firebase project, click the **Android icon** (⚙️ → Add app)
-2. Enter package name: **`com.acksession.zencastr`**
-3. (Optional) App nickname: **"Zencastr Android"**
+2. Enter package name: **`com.example.myapp`** (match your package from `template.properties`)
+3. (Optional) App nickname: **"MyApp Android"**
 4. (Optional) Debug signing certificate SHA-1 (for App Links - can be added later)
 5. Click **"Register app"**
 
@@ -163,8 +163,8 @@ Check: **Actions** tab → Your workflow should now build successfully
 
 ```bash
 keytool -genkey -v \
-  -keystore zencastr-release.jks \
-  -alias zencastr \
+  -keystore myapp-release.jks \
+  -alias myapp \
   -keyalg RSA \
   -keysize 2048 \
   -validity 10000
@@ -184,7 +184,7 @@ You'll be prompted for:
 
 ```bash
 # Move to parent directory (outside git repo)
-mv zencastr-release.jks ../zencastr-release.jks
+mv myapp-release.jks ../myapp-release.jks
 ```
 
 #### Step 3: Create `keystore.properties`
@@ -193,9 +193,9 @@ Create this file in the project root (it's gitignored):
 
 ```bash
 cat > keystore.properties << EOF
-storeFile=../zencastr-release.jks
+storeFile=../myapp-release.jks
 storePassword=YOUR_KEYSTORE_PASSWORD
-keyAlias=zencastr
+keyAlias=myapp
 keyPassword=YOUR_KEY_PASSWORD
 EOF
 ```
@@ -252,7 +252,7 @@ Find APK at: `app/build/outputs/apk/prod/release/app-prod-release.apk`
 #### Step 1: Convert Keystore to Base64
 
 ```bash
-cat ../zencastr-release.jks | base64 | pbcopy
+cat ../myapp-release.jks | base64 | pbcopy
 ```
 
 #### Step 2: Add Secrets to GitHub
@@ -265,7 +265,7 @@ Add these secrets:
 |-------------|-------|-------------|
 | `ANDROID_KEYSTORE_BASE64` | Paste base64 keystore | Encoded keystore file |
 | `KEYSTORE_PASSWORD` | Your keystore password | Password for keystore |
-| `KEY_ALIAS` | `zencastr` | Alias from keytool command |
+| `KEY_ALIAS` | `myapp` | Alias from keytool command |
 | `KEY_PASSWORD` | Your key password | Password for key |
 
 ---
@@ -282,7 +282,7 @@ Add these secrets:
 2. Select your project (or create one linked to Play Console)
 3. Navigate to: **IAM & Admin → Service Accounts**
 4. Click **"Create Service Account"**
-   - Name: `zencastr-github-actions`
+   - Name: `myapp-github-actions`
    - Description: `Service account for GitHub Actions deployment`
 5. Click **"Create and Continue"**
 
@@ -328,14 +328,14 @@ Add to GitHub:
 
 ### 6. Test Deep Links (After App is Installed)
 
-#### Custom Scheme (`zencastr://session/123`)
+#### Custom Scheme (`myapp://session/123`)
 
 ```bash
 adb shell am start -W -a android.intent.action.VIEW \
-  -d "zencastr://session/123" com.acksession.zencastr.dev
+  -d "myapp://session/123" com.example.myapp.dev
 ```
 
-#### App Links (`https://zencastr.com/session/123`)
+#### App Links (`https://example.com/session/123`)
 
 **Requires**: `assetlinks.json` file hosted on your domain
 
@@ -345,7 +345,7 @@ adb shell am start -W -a android.intent.action.VIEW \
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.acksession.zencastr",
+    "package_name": "com.example.myapp",
     "sha256_cert_fingerprints": ["YOUR_SHA256_FINGERPRINT"]
   }
 }]
@@ -353,15 +353,15 @@ adb shell am start -W -a android.intent.action.VIEW \
 
 2. Get SHA-256 fingerprint:
 ```bash
-keytool -list -v -keystore ../zencastr-release.jks -alias zencastr
+keytool -list -v -keystore ../myapp-release.jks -alias myapp
 ```
 
-3. Upload to: `https://zencastr.com/.well-known/assetlinks.json`
+3. Upload to: `https://example.com/.well-known/assetlinks.json`
 
 4. Test:
 ```bash
 adb shell am start -W -a android.intent.action.VIEW \
-  -d "https://zencastr.com/session/123" com.acksession.zencastr
+  -d "https://example.com/session/123" com.example.myapp
 ```
 
 ---
@@ -382,7 +382,7 @@ adb shell am start -W -a android.intent.action.VIEW \
 
 ### Release Builds ✅
 
-- [ ] Keystore generated (`zencastr-release.jks`)
+- [ ] Keystore generated (`MyApp-release.jks`)
 - [ ] Keystore backed up securely
 - [ ] `keystore.properties` created
 - [ ] Signing config uncommented in `app/build.gradle.kts`
@@ -409,7 +409,7 @@ adb shell am start -W -a android.intent.action.VIEW \
 
 ### Build Fails: "No matching client found for package name"
 
-**Solution**: Package name in Firebase must match `com.acksession.zencastr`
+**Solution**: Package name in Firebase must match your package from `template.properties`
 
 ### CI Fails: "GOOGLE_SERVICES_JSON secret not found"
 
@@ -419,7 +419,7 @@ adb shell am start -W -a android.intent.action.VIEW \
 
 **Solution**:
 1. Check `keystore.properties` has correct `storeFile` path
-2. Verify `zencastr-release.jks` exists at that path
+2. Verify `myapp-release.jks` exists at that path
 
 ### Deployment Fails: "Unauthorized service account"
 
@@ -447,7 +447,6 @@ adb shell am start -W -a android.intent.action.VIEW \
 
 ## 📚 Additional Resources
 
-- **Firebase Setup**: `app/README_FIREBASE_SETUP.md`
 - **Fastlane Deployment**: `fastlane/README.md`
 - **CI/CD Workflows**: `.github/workflows/README.md`
 - **Version Management**: `scripts/README.md`

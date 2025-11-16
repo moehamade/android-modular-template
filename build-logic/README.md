@@ -10,16 +10,16 @@ Eliminates boilerplate by centralizing Android, Kotlin, Compose, and dependency 
 
 ### Core Plugins
 
-- **`zencastr.android.application`** - For the `:app` module
-- **`zencastr.android.library`** - For all library modules
-- **`zencastr.android.feature`** - For feature modules (includes library + compose + hilt + common dependencies)
+- **`MyApp.android.application`** - For the `:app` module
+- **`MyApp.android.library`** - For all library modules
+- **`MyApp.android.feature`** - For feature modules (includes library + compose + hilt + common dependencies)
 
 ### Add-on Plugins
 
-- **`zencastr.android.compose`** - Adds Jetpack Compose support
-- **`zencastr.android.hilt`** - Adds Hilt dependency injection
-- **`zencastr.android.room`** - Adds Room database support
-- **`zencastr.android.network`** - Adds Retrofit and networking dependencies
+- **`MyApp.android.compose`** - Adds Jetpack Compose support
+- **`MyApp.android.hilt`** - Adds Hilt dependency injection
+- **`MyApp.android.room`** - Adds Room database support
+- **`MyApp.android.network`** - Adds Retrofit and networking dependencies
 
 ## Configuration
 
@@ -31,7 +31,6 @@ object AndroidConfig {
     const val MIN_SDK = 30
     const val TARGET_SDK = 36
     const val JVM_TARGET = "11"
-    const val NAMESPACE_PREFIX = "com.acksession"
 }
 ```
 
@@ -43,7 +42,7 @@ To change SDK versions or build settings, edit this file - changes apply to all 
 
 ```kotlin
 plugins {
-    id("zencastr.android.feature")
+    id("MyApp.android.feature")
 }
 
 android {
@@ -60,9 +59,9 @@ dependencies {
 
 ```kotlin
 plugins {
-    id("zencastr.android.library")
-    id("zencastr.android.compose")
-    id("zencastr.android.hilt")
+    id("MyApp.android.library")
+    id("MyApp.android.compose")
+    id("MyApp.android.hilt")
 }
 
 android {
@@ -114,7 +113,7 @@ build-logic/
 
 ## Common Dependencies
 
-The `zencastr.android.feature` plugin automatically includes:
+The `MyApp.android.feature` plugin automatically includes:
 
 ```kotlin
 dependencies {

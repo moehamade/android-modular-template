@@ -27,9 +27,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             configureKotlin()
             configureTestDependencies()
 
-            // Add common dependencies to all library modules
             dependencies {
-                // Timber logging
                 add("api", libraries.findLibrary("timber").get())
 
                 // Core common module - provides Environment constants, extensions, and utilities

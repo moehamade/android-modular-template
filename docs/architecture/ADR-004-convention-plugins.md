@@ -24,13 +24,13 @@ We implemented a **Gradle Convention Plugins** system in `build-logic/`:
 
 ### Available Convention Plugins
 
-1. **`zencastr.android.application`** - For `:app` module
-2. **`zencastr.android.library`** - For library modules
-3. **`zencastr.android.feature`** - For feature modules (bundles library + compose + hilt)
-4. **`zencastr.android.compose`** - Adds Jetpack Compose support
-5. **`zencastr.android.hilt`** - Adds Hilt DI (with KSP)
-6. **`zencastr.android.room`** - Adds Room database support
-7. **`zencastr.android.network`** - Adds networking dependencies
+1. **`MyApp.android.application`** - For `:app` module
+2. **`MyApp.android.library`** - For library modules
+3. **`MyApp.android.feature`** - For feature modules (bundles library + compose + hilt)
+4. **`MyApp.android.compose`** - Adds Jetpack Compose support
+5. **`MyApp.android.hilt`** - Adds Hilt DI (with KSP)
+6. **`MyApp.android.room`** - Adds Room database support
+7. **`MyApp.android.network`** - Adds networking dependencies
 
 **Note**: Detekt code quality is applied globally to all subprojects in the root `build.gradle.kts`.
 
@@ -45,7 +45,6 @@ object AndroidConfig {
     const val VERSION_CODE = 1
     const val VERSION_NAME = "1.0"
     const val JVM_TARGET = "11"
-    const val NAMESPACE_PREFIX = "com.acksession"
 }
 ```
 
@@ -64,7 +63,7 @@ plugins {
 }
 
 android {
-    namespace = "com.acksession.feature.profile"
+    namespace = "com.example.feature.profile"
     compileSdk = 36
     
     defaultConfig {
@@ -109,7 +108,7 @@ dependencies {
 **After (with convention plugins)**:
 ```kotlin
 plugins {
-    id("zencastr.android.feature")
+    id("MyApp.android.feature")
 }
 
 android {

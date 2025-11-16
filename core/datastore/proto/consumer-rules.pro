@@ -25,7 +25,7 @@
 }
 
 # Project-specific: Keep proto-generated classes (update namespace when proto files are added)
-# Example: -keep class com.acksession.datastore.proto.UserPreferences { *; }
+# Example: -keep class com.example.datastore.proto.UserPreferences { *; }
 
 # ================================================================================================
 # Protobuf Lite (com.google.protobuf:protobuf-javalite)

@@ -17,8 +17,8 @@ This is the entry point of the application. It's intentionally kept minimal - it
 ```
 app/
 ├── src/main/
-│   ├── kotlin/com/acksession/zencastr/
-│   │   ├── ZencastrApplication.kt      # Application class
+│   ├── kotlin/<base-package>/
+│   │   ├── MyAppApplication.kt         # Application class
 │   │   ├── MainActivity.kt             # Single activity
 │   │   ├── di/                         # App-level DI modules
 │   │   └── navigation/                 # Navigation graph setup
@@ -35,7 +35,7 @@ app/
 
 ```kotlin
 @HiltAndroidApp
-class ZencastrApplication : Application() {
+class MyAppApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         // App-level initialization
@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ZencastrTheme {
-                ZencastrApp()
+            MyAppTheme {
+                MyApp()
             }
         }
     }
@@ -65,9 +65,9 @@ class MainActivity : ComponentActivity() {
 
 ```kotlin
 @Composable
-fun ZencastrApp(navigator: Navigator = rememberNavigator()) {
+fun MyApp(navigator: Navigator = rememberNavigator()) {
     val navController = rememberNavigationController()
-    
+
     NavigationHost(
         navController = navController,
         startDestination = RecordingRoute.Setup(null)
@@ -102,20 +102,20 @@ The `build.gradle.kts` is minimal thanks to convention plugins:
 
 ```kotlin
 plugins {
-    id("zencastr.android.application")
-    id("zencastr.android.compose")
-    id("zencastr.android.hilt")
+    alias(libs.plugins.convention.android.application)
+    alias(libs.plugins.convention.android.compose)
+    alias(libs.plugins.convention.android.hilt)
 }
 
 android {
-    namespace = "${AndroidConfig.NAMESPACE_PREFIX}.zencastr"
-    
+    namespace = projectProperties.appPackageName
+
     defaultConfig {
-        applicationId = "com.acksession.zencastr"
+        applicationId = projectProperties.appPackageName
         versionCode = 1
         versionName = "1.0.0"
-        
-        buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com\"")
+
+        buildConfigField("String", "API_BASE_URL", "\"https://api.example.com\"")
     }
     
     buildFeatures {
@@ -152,13 +152,13 @@ buildTypes {
     debug {
         applicationIdSuffix = ".debug"
         isDebuggable = true
-        buildConfigField("String", "API_BASE_URL", "\"https://api-dev.zencastr.com\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://api-dev.example.com\"")
     }
-    
+
     release {
         isMinifyEnabled = true
         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        buildConfigField("String", "API_BASE_URL", "\"https://api.zencastr.com\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://api.example.com\"")
     }
 }
 ```
@@ -188,7 +188,7 @@ Keep necessary classes for reflection-based libraries (in `proguard-rules.pro`):
 # Kotlinx Serialization
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.**
--keep,includedescriptorclasses class com.acksession.**$$serializer { *; }
+-keep,includedescriptorclasses class **$$serializer { *; }
 
 # Hilt
 -keep class * extends dagger.hilt.android.internal.managers.ApplicationComponentManager { *; }

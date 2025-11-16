@@ -29,7 +29,7 @@
 -dontwarn org.joda.time.Instant
 
 # Project-specific: Keep encrypted storage classes
--keep class com.acksession.datastore.preferences.TinkAuthStorage { *; }
+-keep class com.example.datastore.preferences.TinkAuthStorage { *; }
 
 # ================================================================================================
 # AndroidX DataStore Preferences 1.1.7

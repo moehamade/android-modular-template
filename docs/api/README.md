@@ -1,6 +1,6 @@
 # API Documentation
 
-This directory contains API contract documentation for Zencastr backend services.
+This directory contains API contract documentation for backend services.
 
 ## Purpose
 

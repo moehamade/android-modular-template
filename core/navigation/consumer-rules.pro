@@ -37,8 +37,8 @@
 }
 
 # Project-specific: Keep navigation routes (they use @Serializable)
--keep,allowobfuscation,allowshrinking @kotlinx.serialization.Serializable class com.acksession.navigation.** { *; }
--keep,allowobfuscation,allowshrinking @kotlinx.serialization.Serializable class com.acksession.feature.**.api.** { *; }
+-keep,allowobfuscation,allowshrinking @kotlinx.serialization.Serializable class com.example.navigation.** { *; }
+-keep,allowobfuscation,allowshrinking @kotlinx.serialization.Serializable class com.example.feature.**.api.** { *; }
 
 # ================================================================================================
 # Navigation3 (androidx.navigation3:navigation3-runtime:1.0.0-alpha11)
@@ -50,10 +50,10 @@
 -keep,allowobfuscation,allowshrinking class * implements androidx.navigation3.runtime.NavKey { *; }
 
 # Project-specific: Keep navigation routes (already handled by @Serializable rules above)
-# RecordingRoute in com.acksession.feature.recording.api
-# ProfileRoute in com.acksession.feature.profile.api
--keep,allowobfuscation class com.acksession.feature.recording.api.RecordingRoute** { *; }
--keep,allowobfuscation class com.acksession.feature.profile.api.ProfileRoute** { *; }
+# RecordingRoute in com.example.feature.recording.api
+# ProfileRoute in com.example.feature.profile.api
+-keep,allowobfuscation class com.example.feature.recording.api.RecordingRoute** { *; }
+-keep,allowobfuscation class com.example.feature.profile.api.ProfileRoute** { *; }
 
 # Keep Navigation3 runtime classes
 -keep class androidx.navigation3.runtime.** { *; }

@@ -37,7 +37,7 @@
 }
 
 # Project-specific: Keep all DTOs (they use @Serializable)
--keep,allowobfuscation,allowshrinking @kotlinx.serialization.Serializable class com.acksession.data.remote.dto.** { *; }
+-keep,allowobfuscation,allowshrinking @kotlinx.serialization.Serializable class com.example.data.remote.dto.** { *; }
 
 # Kotlinx Serialization Core
 -keepclassmembers class kotlinx.serialization.json.** {

@@ -8,8 +8,8 @@ import org.gradle.kotlin.dsl.dependencies
  * Usage:
  * ```
  * plugins {
- *     id("zencastr.android.library")
- *     id("zencastr.android.network")
+ *     id("myapp.android.library")
+ *     id("myapp.android.network")
  *     alias(libs.plugins.kotlin.serialization)
  * }
  * ```
