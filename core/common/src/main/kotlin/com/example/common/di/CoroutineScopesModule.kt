@@ -3,7 +3,7 @@ package com.example.common.di
 import com.example.common.di.qualifiers.ApplicationScope
 import com.example.common.di.qualifiers.ApplicationScopeIO
 import com.example.common.di.qualifiers.Dispatcher
-import com.example.common.di.qualifiers.ZencastrDispatchers
+import com.example.common.di.qualifiers.AppDispatchers
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,7 +39,7 @@ object CoroutineScopesModule {
     @Singleton
     @ApplicationScope
     fun providesApplicationScope(
-        @Dispatcher(ZencastrDispatchers.Default) defaultDispatcher: CoroutineDispatcher
+        @Dispatcher(AppDispatchers.Default) defaultDispatcher: CoroutineDispatcher
     ): CoroutineScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
     /**
@@ -58,6 +58,6 @@ object CoroutineScopesModule {
     @Singleton
     @ApplicationScopeIO
     fun providesApplicationScopeIO(
-        @Dispatcher(ZencastrDispatchers.IO) ioDispatcher: CoroutineDispatcher
+        @Dispatcher(AppDispatchers.IO) ioDispatcher: CoroutineDispatcher
     ): CoroutineScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 }

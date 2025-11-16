@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Create Firebase project at [Firebase Console](https://console.firebase.google.com)
    - Add Android app with package: `com.example.myapp` (or your chosen package name)
    - Download `google-services.json` and place in `app/` directory
-   - See [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration) for detailed instructions
+   - See [GETTING_STARTED.md](GETTING_STARTED.md#12-firebase-configuration) for detailed instructions
    - **Note**: Update package name after rebranding the project
 
 2. **Verify Setup**:
@@ -37,11 +37,11 @@ Add to GitHub repository secrets (**Settings → Secrets and variables → Actio
 ### Optional: Release Signing (for Play Store)
 
 Only needed when ready to publish to Play Store:
-- Generate keystore: See `MANUAL_SETUP_REQUIRED.md`
+- Generate keystore: See `GETTING_STARTED.md`
 - Create `keystore.properties` file (gitignored)
 - Uncomment signing config in `app/build.gradle.kts`
 
-For detailed setup instructions, see `MANUAL_SETUP_REQUIRED.md` and `NEXT_STEPS.md`.
+For detailed setup instructions, see `GETTING_STARTED.md`.
 
 ## Build Commands
 
@@ -376,7 +376,7 @@ Example: `https://example.com/content/123`
 
 **Required**: Add `google-services.json` from Firebase Console to `app/` directory.
 
-See [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration) for detailed setup instructions:
+See [GETTING_STARTED.md](GETTING_STARTED.md#12-firebase-configuration) for detailed setup instructions:
 1. Create Firebase project
 2. Add Android app with your package name (e.g., `com.example.myapp`)
 3. Download `google-services.json`
@@ -559,7 +559,7 @@ git push origin v1.0.0
 ```
 
 **Deploy Workflow** (disabled by default):
-- See `MANUAL_SETUP_REQUIRED.md` for enabling Play Store deployment
+- See `GETTING_STARTED.md` for enabling Play Store deployment
 - Requires keystore setup and Play Store service account
 
 ## Documentation
@@ -588,9 +588,7 @@ Located in `docs/api/`:
 ### Production Setup and Implementation
 
 Production readiness documentation:
-- **`MANUAL_SETUP_REQUIRED.md`** - Step-by-step setup guide (Firebase, keystore, Play Store)
-- **`NEXT_STEPS.md`** - Quick reference and current status
-- **`docs/PRODUCTION_SETUP.md`** - Release keystore, signing, Play Store submission
+- **`GETTING_STARTED.md`** - Complete setup guide from local dev to Play Store deployment
 
 **Current Status: 100% Development Ready** 🎉
 

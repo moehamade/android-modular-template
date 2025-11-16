@@ -1,7 +1,7 @@
 package com.example.domain.usecase
 
 import com.example.common.di.qualifiers.Dispatcher
-import com.example.common.di.qualifiers.ZencastrDispatchers
+import com.example.common.di.qualifiers.AppDispatchers
 import com.example.domain.model.Result
 import com.example.domain.model.User
 import com.example.domain.repository.AuthRepository
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    @param:Dispatcher(ZencastrDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
+    @param:Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(email: String, password: String): Result<User> = withContext(ioDispatcher) {
         // Step 1: Authenticate and get tokens

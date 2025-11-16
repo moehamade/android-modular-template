@@ -60,7 +60,7 @@
         <!-- Firebase Cloud Messaging Service -->
         <!-- tools:ignore="Instantiatable" - Lint false positive for FirebaseMessagingService -->
         <service
-            android:name="com.example.notifications.ZencastrFCMService"
+            android:name="com.example.notifications.AppFCMService"
             android:exported="false"
             tools:ignore="Instantiatable">
             <intent-filter>

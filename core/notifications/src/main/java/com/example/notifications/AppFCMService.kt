@@ -18,7 +18,7 @@ import javax.inject.Inject
  * Note: This service runs in a separate process and must be registered in AndroidManifest.
  */
 @AndroidEntryPoint
-class ZencastrFCMService : FirebaseMessagingService() {
+class AppFCMService : FirebaseMessagingService() {
 
     @Inject
     lateinit var analytics: AnalyticsTracker

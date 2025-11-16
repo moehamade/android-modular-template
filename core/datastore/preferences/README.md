@@ -95,7 +95,7 @@ object DataStoreModule {
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create(
-            produceFile = { context.preferencesDataStoreFile("zencastr_prefs") }
+            produceFile = { context.preferencesDataStoreFile("myapp_prefs") }
         )
     }
 }
@@ -125,7 +125,7 @@ val dataStore = PreferenceDataStoreFactory.create(
     migrations = listOf(
         SharedPreferencesMigration(context, "old_prefs_name")
     ),
-    produceFile = { context.preferencesDataStoreFile("zencastr_prefs") }
+    produceFile = { context.preferencesDataStoreFile("myapp_prefs") }
 )
 ```
 

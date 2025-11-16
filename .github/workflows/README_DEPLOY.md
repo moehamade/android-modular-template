@@ -107,13 +107,13 @@ git push
 
 ## Detailed Setup Guide
 
-See [`MANUAL_SETUP_REQUIRED.md`](../../MANUAL_SETUP_REQUIRED.md) for complete step-by-step instructions.
+See [`GETTING_STARTED.md`](../../GETTING_STARTED.md) for complete step-by-step instructions.
 
 ---
 
 ## Need Help?
 
 - **Build issues**: Check `build-release.yml` workflow logs
-- **Keystore generation**: See `MANUAL_SETUP_REQUIRED.md#3`
-- **Play Store setup**: See `MANUAL_SETUP_REQUIRED.md#5`
+- **Keystore generation**: See `GETTING_STARTED.md#41-generate-release-keystore`
+- **Play Store setup**: See `GETTING_STARTED.md#step-5-play-store-deployment-setup-when-ready-to-publish`
 - **CI/CD issues**: Check `.github/workflows/README.md`

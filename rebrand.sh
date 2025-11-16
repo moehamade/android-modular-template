@@ -442,7 +442,7 @@ else
     echo "     - Create project at https://console.firebase.google.com"
     echo "     - Add Android app with package: $NEW_PACKAGE"
     echo "     - Download google-services.json to app/ directory"
-    echo "     - See MANUAL_SETUP_REQUIRED.md#1-firebase-configuration for details"
+    echo "     - See GETTING_STARTED.md#12-firebase-configuration for details"
     echo "  4. Build the app: ./gradlew :app:assembleDevDebug"
     echo "  5. Commit changes: git add . && git commit -m 'Rebrand to $NEW_PROJECT_NAME'"
     echo ""

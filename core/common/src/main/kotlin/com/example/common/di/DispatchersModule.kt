@@ -1,7 +1,7 @@
 package com.example.common.di
 
 import com.example.common.di.qualifiers.Dispatcher
-import com.example.common.di.qualifiers.ZencastrDispatchers
+import com.example.common.di.qualifiers.AppDispatchers
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,10 +14,10 @@ import javax.inject.Singleton
  * Hilt module providing CoroutineDispatchers for dependency injection.
  *
  * **Available Dispatchers:**
- * - `@Dispatcher(ZencastrDispatchers.Default)` - For CPU-bound work
- * - `@Dispatcher(ZencastrDispatchers.IO)` - For I/O operations
- * - `@Dispatcher(ZencastrDispatchers.Main)` - For UI updates
- * - `@Dispatcher(ZencastrDispatchers.Unconfined)` - For tests/special cases
+ * - `@Dispatcher(AppDispatcher.Default)` - For CPU-bound work
+ * - `@Dispatcher(AppDispatcher.IO)` - For I/O operations
+ * - `@Dispatcher(AppDispatcher.Main)` - For UI updates
+ * - `@Dispatcher(AppDispatcher.Unconfined)` - For tests/special cases
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -35,7 +35,7 @@ object DispatchersModule {
      */
     @Provides
     @Singleton
-    @Dispatcher(ZencastrDispatchers.Default)
+    @Dispatcher(AppDispatchers.Default)
     fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
     /**
@@ -49,7 +49,7 @@ object DispatchersModule {
      */
     @Provides
     @Singleton
-    @Dispatcher(ZencastrDispatchers.IO)
+    @Dispatcher(AppDispatchers.IO)
     fun providesIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     /**
@@ -62,7 +62,7 @@ object DispatchersModule {
      */
     @Provides
     @Singleton
-    @Dispatcher(ZencastrDispatchers.Main)
+    @Dispatcher(AppDispatchers.Main)
     fun providesMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
 
     /**
@@ -72,6 +72,6 @@ object DispatchersModule {
      */
     @Provides
     @Singleton
-    @Dispatcher(ZencastrDispatchers.Unconfined)
+    @Dispatcher(AppDispatchers.Unconfined)
     fun providesUnconfinedDispatcher(): CoroutineDispatcher = Dispatchers.Unconfined
 }

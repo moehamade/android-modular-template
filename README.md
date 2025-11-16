@@ -147,7 +147,7 @@ The template includes a powerful rebrand script that automatically renames every
 **Step 3: Firebase Setup** (Required)
 
 Create Firebase project and download `google-services.json`:
-- See detailed instructions in [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration)
+- See detailed instructions in [GETTING_STARTED.md](GETTING_STARTED.md#12-firebase-configuration)
 
 **Step 4: Build and run**
 ```bash
@@ -165,7 +165,7 @@ If you prefer manual setup:
    ```
 
 2. **Configure Firebase** (required for build)
-   - See [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration)
+   - See [GETTING_STARTED.md](GETTING_STARTED.md#12-firebase-configuration)
    - Download `google-services.json` to `app/` directory
 
 3. **Sync and build**
@@ -293,13 +293,12 @@ GitHub Actions workflows included:
   - Upload artifacts
   - Create GitHub releases
 
-See `MANUAL_SETUP_REQUIRED.md` for Play Store deployment setup.
+See `GETTING_STARTED.md` for Play Store deployment setup.
 
 ## Documentation
 
 ### Getting Started
-- **[NEXT_STEPS.md](NEXT_STEPS.md)** - 📍 **Start here!** Quick status check and what to do next
-- **[MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md)** - 📖 Detailed step-by-step setup guide (Firebase, keystore, Play Store)
+- **[GETTING_STARTED.md](GETTING_STARTED.md)** - 📍 **Start here!** Complete setup guide from local dev to Play Store
 
 ### Development
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines, commit conventions, code style
@@ -337,7 +336,7 @@ After rebranding:
 ## Troubleshooting
 
 **Build fails with "google-services.json not found"**:
-- See [MANUAL_SETUP_REQUIRED.md](MANUAL_SETUP_REQUIRED.md#1-firebase-configuration) for setup instructions
+- See [GETTING_STARTED.md](GETTING_STARTED.md#12-firebase-configuration) for setup instructions
 - For CI/CD, add `GOOGLE_SERVICES_JSON` GitHub secret
 
 **Import/sync issues**:

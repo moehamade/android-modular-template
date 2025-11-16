@@ -10,13 +10,13 @@ import kotlin.annotation.AnnotationRetention.RUNTIME
  * ```
  * @Inject
  * constructor(
- *     @Dispatcher(ZencastrDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
+ *     @Dispatcher(AppDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
  * )
  * ```
  */
 @Qualifier
 @Retention(RUNTIME)
-annotation class Dispatcher(val dispatcher: ZencastrDispatchers)
+annotation class Dispatcher(val dispatcher: AppDispatchers)
 
 /**
  * Enum defining available dispatchers in the MyApp app.
@@ -26,7 +26,7 @@ annotation class Dispatcher(val dispatcher: ZencastrDispatchers)
  * - **Main**: For UI updates (e.g., updating Compose state)
  * - **Unconfined**: For special cases and tests (avoid in production)
  */
-enum class ZencastrDispatchers {
+enum class AppDispatchers {
     Default,
     IO,
     Main,
