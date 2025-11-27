@@ -48,7 +48,7 @@ print_step() {
 # Validate package name format
 validate_package_name() {
     local package=$1
-    if [[ ! $package =~ ^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$ ]]; then
+    if [[ ! $package =~ ^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$ ]]; then
         print_error "Invalid package name format: $package"
         print_info "Package name must be in format: com.company.app (lowercase, dots, no spaces)"
         return 1
@@ -204,6 +204,21 @@ if [[ -f "$MANIFEST_FILE" ]]; then
     print_success "AndroidManifest.xml updated"
 else
     print_warning "AndroidManifest.xml not found at $MANIFEST_FILE"
+fi
+
+print_step "Updating themes.xml..."
+
+THEMES_FILE="app/src/main/res/values/themes.xml"
+
+if [[ -f "$THEMES_FILE" ]]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "s|Theme\\.${CURRENT_PROJECT_NAME}|Theme.${NEW_PROJECT_NAME}|g" "$THEMES_FILE"
+    else
+        sed -i "s|Theme\\.${CURRENT_PROJECT_NAME}|Theme.${NEW_PROJECT_NAME}|g" "$THEMES_FILE"
+    fi
+    print_success "themes.xml updated"
+else
+    print_warning "themes.xml not found at $THEMES_FILE"
 fi
 
 # ============================================================================
